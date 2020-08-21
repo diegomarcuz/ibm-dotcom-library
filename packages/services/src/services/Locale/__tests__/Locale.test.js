@@ -14,13 +14,18 @@ import root from 'window-or-global';
 
 const mockDigitalDataResponse = digitalDataResponse;
 
-jest.mock('@carbon/ibmdotcom-utilities', () => ({
-  ipcinfoCookie: {
+jest.mock(
+  '@carbon/ibmdotcom-utilities/lib/utilities/ipcinfoCookie/ipcinfoCookie',
+  () => ({
     get: jest.fn(() => Promise.resolve({ cc: 'us', lc: 'en' })),
     set: jest.fn(() => Promise.resolve({})),
-  },
-  geolocation: jest.fn(() => Promise.resolve('us')),
-}));
+  })
+);
+
+jest.mock(
+  '@carbon/ibmdotcom-utilities/lib/utilities/geolocation/geolocation',
+  () => jest.fn(() => Promise.resolve('us'))
+);
 
 describe('LocaleAPI', () => {
   const _cc = 'us';
@@ -37,6 +42,8 @@ describe('LocaleAPI', () => {
     );
 
     root.digitalData = mockDigitalDataResponse;
+
+    LocaleAPI.clearCache();
   });
 
   afterEach(() => {
@@ -119,5 +126,13 @@ describe('LocaleAPI', () => {
         'Content-Type': 'application/json; charset=utf-8',
       },
     });
+  });
+
+  it('should use the cache for the country list, keyed by locale', async () => {
+    await LocaleAPI.getList({ cc: 'us', lc: 'en' });
+    await LocaleAPI.getList({ cc: 'us', lc: 'en' });
+    await LocaleAPI.getList({ cc: 'kr', lc: 'ko' });
+
+    expect(mockAxios.get).toHaveBeenCalledTimes(2);
   });
 });

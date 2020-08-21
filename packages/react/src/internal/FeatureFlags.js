@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corp. 2016, 2018
+ * Copyright IBM Corp. 2016, 2020
  *
  * This source code is licensed under the Apache-2.0 license found in the
  * LICENSE file in the root directory of this source tree.
@@ -23,6 +23,14 @@ export const DDS_FLAGS_ALL = process.env.DDS_FLAGS_ALL === 'true' || false;
  */
 export const DDS_MASTHEAD_L1 =
   process.env.DDS_MASTHEAD_L1 === 'true' || DDS_FLAGS_ALL || false;
+
+/**
+ * Feature flag to turn on the Card with Pictogram
+ *
+ * @type {boolean}
+ */
+export const DDS_CARD_WITH_PICTOGRAM =
+  process.env.DDS_CARD_WITH_PICTOGRAM === 'true' || DDS_FLAGS_ALL || false;
 
 /**
  * Feature flag for the optional language selector in the footer
@@ -55,3 +63,19 @@ export const DDS_SIMPLE_OVERVIEW =
  */
 export const DDS_LOGO_GRID =
   process.env.DDS_LOGO_GRID === 'true' || DDS_FLAGS_ALL || false;
+
+/**
+ * This determines if the logo grid will be rendered or not
+ *
+ * @type {string | boolean}
+ */
+export const DDS_CALLOUT_DATA =
+  process.env.DDS_CALLOUT_DATA === 'true' || DDS_FLAGS_ALL || false;
+
+/**
+ * This determines if content block - headlines will be rendered or not
+ *
+ * @type {string | boolean}
+ */
+export const DDS_CONTENTBLOCK_HEADLINES =
+  process.env.DDS_CONTENTBLOCK_HEADLINES === 'true' || DDS_FLAGS_ALL || false;

@@ -4,18 +4,18 @@
  * This source code is licensed under the Apache-2.0 license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import {
-  settings as ddsSettings,
-  removeHtmlTagEntities,
-} from '@carbon/ibmdotcom-utilities';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import { ExpressiveModal } from '../ExpressiveModal';
 import { Image } from '../Image';
 import { ModalBody } from '../../internal/vendor/carbon-components-react/components/ComposedModal/ComposedModal';
 import PropTypes from 'prop-types';
+import removeHtmlTagEntities from '@carbon/ibmdotcom-utilities/es/utilities/removeHtmlTagEntities/removeHtmlTagEntities';
+import root from 'window-or-global';
 import settings from 'carbon-components/es/globals/js/settings';
+import uniqueid from '@carbon/ibmdotcom-utilities/es/utilities/uniqueid/uniqueid';
 import { VideoPlayer } from '../VideoPlayer';
-import { VideoPlayerAPI } from '@carbon/ibmdotcom-services';
+import VideoPlayerAPI from '@carbon/ibmdotcom-services/es/services/VideoPlayer/VideoPlayer';
 
 const { stablePrefix } = ddsSettings;
 const { prefix } = settings;
@@ -23,12 +23,46 @@ const { prefix } = settings;
 /**
  * LightboxMediaViewer Component.
  */
-const LightboxMediaViewer = ({ media, ...modalProps }) => {
+const LightboxMediaViewer = ({ media, onClose, ...modalProps }) => {
   const [videoData, setVideoData] = useState({
     title: '',
     alt: '',
     description: '',
   });
+
+  /**
+   * Generates an ID for video title to be used by aria-labelledby.
+   */
+  const titleId = uniqueid('dds-');
+
+  /**
+   * Generates an ID for video description, to be used by aria-describedby.
+   */
+  const descriptionId = uniqueid('dds-');
+
+  const containerRef = useRef(null);
+
+  /**
+   * Adds aria-labelledby attribute to dialog container with video title.
+   */
+  useEffect(() => {
+    const { current: containerNode } = containerRef;
+    const dialogNode = containerNode.querySelector('div[role="dialog"]');
+    if (dialogNode && videoData.title) {
+      dialogNode.setAttribute('aria-labelledby', titleId);
+    }
+  }, [titleId, videoData.title]);
+
+  /**
+   * Adds aria-describedby attribute to dialog container with video description.
+   */
+  useEffect(() => {
+    const { current: containerNode } = containerRef;
+    const dialogNode = containerNode.querySelector('div[role="dialog"]');
+    if (dialogNode && videoData.description) {
+      dialogNode.setAttribute('aria-describedby', descriptionId);
+    }
+  }, [descriptionId, videoData.description]);
 
   useEffect(() => {
     let stale = false;
@@ -60,8 +94,9 @@ const LightboxMediaViewer = ({ media, ...modalProps }) => {
   return (
     <section
       data-autoid={`${stablePrefix}--lightbox-media-viewer`}
-      className={`${prefix}--lightbox-media-viewer`}>
-      <ExpressiveModal fullwidth={true} {...modalProps}>
+      className={`${prefix}--lightbox-media-viewer`}
+      ref={containerRef}>
+      <ExpressiveModal fullwidth={true} {...modalProps} onClose={closeModal}>
         <ModalBody>
           <div className={`${prefix}--lightbox-media-viewer__container`}>
             <div className={`${prefix}--lightbox-media-viewer__row`}>
@@ -78,6 +113,7 @@ const LightboxMediaViewer = ({ media, ...modalProps }) => {
                 <div className={`${prefix}--lightbox-media-viewer__content`}>
                   {videoData.title && (
                     <div
+                      id={titleId}
                       data-autoid={`${stablePrefix}--lightbox-media-viewer__content__title`}
                       className={`${prefix}--lightbox-media-viewer__content__title`}>
                       {videoData.title}
@@ -85,6 +121,7 @@ const LightboxMediaViewer = ({ media, ...modalProps }) => {
                   )}
                   {videoData.description && (
                     <div
+                      id={descriptionId}
                       data-autoid={`${stablePrefix}--lightbox-media-viewer__content__desc`}
                       className={`${prefix}--lightbox-media-viewer__content__desc`}>
                       {videoDesc}
@@ -98,6 +135,18 @@ const LightboxMediaViewer = ({ media, ...modalProps }) => {
       </ExpressiveModal>
     </section>
   );
+
+  /**
+   * Stop video on modal close
+   */
+  function closeModal() {
+    if (onClose?.() !== false) {
+      root.kWidget.addReadyCallback(videoId => {
+        const kdp = document.getElementById(videoId);
+        kdp.sendNotification('doStop');
+      });
+    }
+  }
 };
 
 LightboxMediaViewer.propTypes = {
@@ -119,5 +168,10 @@ LightboxMediaViewer.propTypes = {
     alt: PropTypes.string,
     description: PropTypes.string,
   }).isRequired,
+
+  /**
+   * Function to be triggered on close of Modal.
+   */
+  onClose: PropTypes.func,
 };
 export default LightboxMediaViewer;

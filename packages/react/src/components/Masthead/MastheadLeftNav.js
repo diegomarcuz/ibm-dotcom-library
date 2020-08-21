@@ -5,8 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import ArrowLeft16 from '@carbon/icons-react/es/arrow--left/16';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import HeaderSideNavItems from '../../internal/vendor/carbon-components-react/components/UIShell/HeaderSideNavItems';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -14,8 +13,8 @@ import settings from 'carbon-components/es/globals/js/settings';
 import SideNav from '../../internal/vendor/carbon-components-react/components/UIShell/SideNav';
 import SideNavItems from '../../internal/vendor/carbon-components-react/components/UIShell/SideNavItems';
 import SideNavLink from '../../internal/vendor/carbon-components-react/components/UIShell/SideNavLink';
-import SideNavMenu from '../carbon-components-react/UIShell/SideNavMenu';
 import SideNavMenuItem from '../../internal/vendor/carbon-components-react/components/UIShell/SideNavMenuItem';
+import SideNavMenuWithBackFoward from '../carbon-components-react/UIShell/SideNavMenuWithBackForward';
 
 const { stablePrefix } = ddsSettings;
 const { prefix } = settings;
@@ -24,9 +23,11 @@ const { prefix } = settings;
  * Masthead left nav component.
  */
 const MastheadLeftNav = ({
+  backButtonText,
   navigation,
   isSideNavExpanded,
-  ...leftNavProps
+  platform,
+  ...rest
 }) => {
   /**
    * Left side navigation
@@ -35,28 +36,27 @@ const MastheadLeftNav = ({
    */
   const sideNav = navigation.map((link, i) => {
     if (link.hasMenu) {
+      const autoid = `${stablePrefix}--masthead-${rest.navType}-sidenav__l0-nav${i}`;
       return (
-        <SideNavMenu title={link.title} key={i}>
-          <SideNavMenuItem
-            onClick={event => event.preventDefault()}
-            className={`${prefix}--masthead__side-nav--submemu-back`}
-            data-autoid={`${stablePrefix}--masthead__l0-sidenav--subnav-back-${i}`}
-            isbackbutton="true"
-            key={i}>
-            <ArrowLeft16 />
-            Back
-          </SideNavMenuItem>
-          <li className={`${prefix}--masthead__side-nav--submemu-title`}>
-            {link.title}
-          </li>
-          {renderNav(link.menuSections)}
-        </SideNavMenu>
+        <SideNavMenuWithBackFoward
+          title={link.title}
+          backButtonText={backButtonText}
+          key={i}
+          autoid={autoid}
+          navType={rest.navType}>
+          {renderNavSections(
+            link.menuSections,
+            backButtonText,
+            autoid,
+            rest.navType
+          )}
+        </SideNavMenuWithBackFoward>
       );
     } else {
       return (
         <SideNavLink
           href={link.url}
-          data-autoid={`${stablePrefix}--masthead__l0-sidenav--nav-${i}`}
+          data-autoid={`${stablePrefix}--masthead-${rest.navType}-sidenav__l0-nav${i}`}
           key={i}>
           {link.title}
         </SideNavLink>
@@ -69,14 +69,15 @@ const MastheadLeftNav = ({
       aria-label="Side navigation"
       expanded={isSideNavExpanded}
       isPersistent={false}>
-      <nav data-autoid={`${stablePrefix}--masthead__l0-sidenav`}>
-        {leftNavProps.platform && (
-          <a
-            data-autoid={`${stablePrefix}--side-nav__submenu-platform`}
-            href={leftNavProps.platform.url}
+      <nav
+        data-autoid={`${stablePrefix}--masthead-${rest.navType}-sidenav__l0`}>
+        {platform && (
+          <a // eslint-disable-line jsx-a11y/role-supports-aria-props
+            data-autoid={`${stablePrefix}--masthead-${rest.navType}-sidenav__l0-productname`}
+            href={platform.url}
             aria-haspopup="true"
             className={`${prefix}--side-nav__submenu ${prefix}--side-nav__submenu-platform`}>
-            {leftNavProps.platform.name}
+            {platform.name}
           </a>
         )}
         <SideNavItems>
@@ -90,27 +91,74 @@ const MastheadLeftNav = ({
 /**
  * Loops through and renders a list of links for the side nav
  *
- * @param {Array} sections A list of links to be rendered
+ * @param {Array} sections A list of link sections to be rendered
+ * @param {string} backButtonText back button text
+ * @param {string} autoid autoid predecessor
+ * @param {string} navType navigation type
  * @returns {object} JSX object
  */
-function renderNav(sections) {
-  const navItems = [];
-  sections.forEach((section, i) => {
+function renderNavSections(sections, backButtonText, autoid, navType) {
+  const sectionItems = [];
+  sections.forEach(section => {
     section.menuItems.forEach((item, j) => {
-      navItems.push(
-        <SideNavMenuItem
-          href={item.url}
-          data-autoid={`${stablePrefix}--masthead__l0-sidenav--subnav-col${i}-item${j}`}
-          key={item.title}>
-          {item.title}
-        </SideNavMenuItem>
-      );
+      const dataAutoId = `${autoid}-list${j}`;
+      if (item.megapanelContent) {
+        sectionItems.push(
+          <SideNavMenuWithBackFoward
+            title={item.title}
+            titleUrl={item.url}
+            backButtonText={backButtonText}
+            autoid={dataAutoId}
+            navType={navType}
+            key={j}>
+            {renderNavItem(item.megapanelContent.quickLinks.links, dataAutoId)}
+          </SideNavMenuWithBackFoward>
+        );
+      } else {
+        sectionItems.push(
+          <SideNavMenuItem
+            href={item.url}
+            data-autoid={dataAutoId}
+            key={item.title}>
+            {item.title}
+          </SideNavMenuItem>
+        );
+      }
     });
+  });
+
+  return sectionItems;
+}
+
+/**
+ * Loops through and renders a list of links for the side nav
+ *
+ * @param {Array} items A list of links to be rendered
+ * @param {string} autoid autoid predecessor
+ * @returns {object} JSX object
+ */
+function renderNavItem(items, autoid) {
+  const navItems = [];
+  items.forEach((item, i) => {
+    const dataAutoId = `${autoid}-item${i}`;
+    navItems.push(
+      <SideNavMenuItem
+        href={item.url}
+        data-autoid={dataAutoId}
+        key={item.title}>
+        {item.title}
+      </SideNavMenuItem>
+    );
   });
   return navItems;
 }
 
 MastheadLeftNav.propTypes = {
+  /**
+   * Back button text
+   */
+  backButtonText: PropTypes.string,
+
   /**
    * Object containing left navigation elements.
    */
@@ -131,11 +179,22 @@ MastheadLeftNav.propTypes = {
       ),
     })
   ),
-
   /**
    * `true` to make the sidenav expanded.
    */
   isSideNavExpanded: PropTypes.bool,
+
+  /**
+   * Platform object with name and url
+   */
+  platform: PropTypes.shape({
+    name: PropTypes.string,
+    url: PropTypes.string,
+  }),
+};
+
+MastheadLeftNav.defaultProps = {
+  backButtonText: 'Back',
 };
 
 export default MastheadLeftNav;

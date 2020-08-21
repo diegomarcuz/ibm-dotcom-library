@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import root from 'window-or-global';
 
 /**
@@ -36,7 +36,9 @@ let _dataLayerReadyPromise;
  * Timeout loop to check if the digitalData object is ready.
  * This is the only way to achieve this without jQuery, as the event trigger
  * is fired from jQuery's custom event layer as
- * $(document).trigger('datalayer_ready')
+ * $(document).trigger('datalayer_ready').
+ *
+ * Application should `window.digitalData` up-front, e.g. in a `<script>` tag in `<head>`, that eliminates the polling.
  *
  * @private
  */
@@ -89,7 +91,9 @@ class DDOAPI {
   }
 
   /**
-   * Gets the full digitalData (DDO) object
+   * Gets the full digitalData (DDO) object.
+   * Application should `window.digitalData` up-front, e.g. in a `<script>` tag in `<head>`.
+   * For quick developerment purpose, what `ibm-common.js` automatically populates can be used.
    *
    * @returns {Promise<*>} Promise object
    */
@@ -104,18 +108,22 @@ class DDOAPI {
   }
 
   /**
-   * Sets the version of the library to the DDO
+   * Sets the version of the library to the DDO.
+   * Application should `window.digitalData` up-front, e.g. in a `<script>` tag in `<head>`.
+   * For quick developerment purpose, what `ibm-common.js` automatically populates can be used.
    *
    * @returns {Promise<any>} Promise object
    */
   static async setVersion() {
     return await this.isReady().then(() => {
-      root.digitalData.page.version = ddsSettings.version;
+      root.digitalData.page.pageInfo.version = ddsSettings.version;
     });
   }
 
   /**
-   * Gets the locale for the current page based on the language set as metadata
+   * Gets the locale for the current page based on the language set as metadata.
+   * Application should `window.digitalData` up-front, e.g. in a `<script>` tag in `<head>`.
+   * For quick developerment purpose, what `ibm-common.js` automatically populates can be used.
    *
    * @returns {Promise<*>} Promise object
    */

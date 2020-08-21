@@ -5,9 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { geolocation, ipcinfoCookie } from '@carbon/ibmdotcom-utilities';
 import axios from 'axios';
 import DDOAPI from '../DDO/DDO';
+import geolocation from '@carbon/ibmdotcom-utilities/es/utilities/geolocation/geolocation';
+import ipcinfoCookie from '@carbon/ibmdotcom-utilities/es/utilities/ipcinfoCookie/ipcinfoCookie';
 import root from 'window-or-global';
 
 /**
@@ -123,6 +124,13 @@ const _getLocaleByLangAttr = () => {
 };
 
 /**
+ * The cache for in-flight or resolved requests for the country list, keyed by the initiating locale.
+ *
+ * @type {object<string, LocaleList>}
+ */
+const _requestsList = {};
+
+/**
  * Return a locale object based on the DDO API, or "false"
  * so the consumer can decide what to do next
  *
@@ -176,6 +184,19 @@ async function _getLocaleFromDDO() {
  * ibm.com
  */
 class LocaleAPI {
+  /**
+   * Clears the cache.
+   */
+  static clearCache() {
+    Object.keys(_requestsList).forEach(key => delete _requestsList[key]);
+    for (let i = 0; i < sessionStorage.length; ++i) {
+      const key = sessionStorage.key(i);
+      if (key.indexOf(_sessionListKey) === 0) {
+        sessionStorage.removeItem(key);
+      }
+    }
+  }
+
   /**
    * Gets the user's locale
    *
@@ -305,9 +326,14 @@ class LocaleAPI {
    * }
    */
   static async getList({ cc, lc }) {
-    return new Promise((resolve, reject) => {
+    const key = `${lc}-${cc}`;
+    const cachedRequest = _requestsList[key];
+    if (cachedRequest) {
+      return cachedRequest;
+    }
+    return (_requestsList[key] = new Promise((resolve, reject) => {
       this.fetchList(cc, lc, resolve, reject);
-    });
+    }));
   }
 
   /**

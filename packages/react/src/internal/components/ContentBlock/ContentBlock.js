@@ -5,14 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {
-  settings as ddsSettings,
-  markdownToHtml,
-} from '@carbon/ibmdotcom-utilities';
 import { CTA } from '../../../components/CTA';
 import cx from 'classnames';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import { HorizontalRule } from '../../../components/HorizontalRule';
 import { Layout } from '../../../components/Layout';
+import markdownToHtml from '@carbon/ibmdotcom-utilities/es/utilities/markdownToHtml/markdownToHtml';
 import PropTypes from 'prop-types';
 import React from 'react';
 import settings from 'carbon-components/es/globals/js/settings';
@@ -30,15 +28,9 @@ const ContentBlock = ({
   customClassName,
   cta,
   aside,
-  inverse,
   border,
 }) => {
-  const classnames = cx(
-    `${prefix}--content-block`,
-    { [`${prefix}--content-block--inverse`]: inverse },
-    customClassName
-  );
-
+  const classnames = cx(`${prefix}--content-block`, customClassName);
   const setborder = aside ? false : border;
   const content = (
     <>
@@ -136,11 +128,6 @@ function _renderCTA(cta) {
 }
 
 ContentBlock.propTypes = {
-  /**
-   * `true` to use the inverse theme.
-   */
-  inverse: PropTypes.bool,
-
   /**
    * Heading text.
    */

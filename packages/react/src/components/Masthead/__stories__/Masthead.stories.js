@@ -12,6 +12,11 @@ import Masthead from '../Masthead';
 import mastheadKnobs from './data/Masthead.stories.knobs.js';
 import React from 'react';
 import readme from '../README.stories.mdx';
+import TranslationAPI from '@carbon/ibmdotcom-services/es/services/Translation/Translation';
+
+// For mocking in integration tests
+// TODO: See if `TranslationAPI.getTranslation()` call can be avoided when we use mock data
+const origGetTranslation = TranslationAPI.getTranslation;
 
 export default {
   title: 'Components|Masthead',
@@ -30,11 +35,36 @@ Default.story = {
   parameters: {
     knobs: {
       Masthead: ({ groupId }) => {
+        const useMockData = boolean('Use mock data', inPercy());
+
+        // For mocking in integration tests
+        // TODO: See if `TranslationAPI.getTranslation()` call can be avoided when we use mock data
+        TranslationAPI.getTranslation = !useMockData
+          ? origGetTranslation
+          : () =>
+              new Promise(resolve => {
+                setTimeout(resolve, 300000);
+              });
+
+        const mastheadL1Data = DDS_MASTHEAD_L1 && {
+          title: text(
+            'L1 title (title) (experimental)',
+            'Stock Charts',
+            groupId
+          ),
+          titleLink: text(
+            'L1 title link (titleLink) (experimental)',
+            'https://example.com/',
+            groupId
+          ),
+          navigationL1: mastheadKnobs.navigation.custom,
+        };
+
         const standardProps = {
           navigation: select(
             'navigation data (navigation)',
             mastheadKnobs.navigation,
-            inPercy()
+            useMockData
               ? mastheadKnobs.navigation.custom
               : mastheadKnobs.navigation.default,
             groupId
@@ -60,27 +90,10 @@ Default.story = {
             'Search all of IBM',
             groupId
           ),
-        };
-        const mastheadL1Props = DDS_MASTHEAD_L1 && {
-          title: text(
-            'L1 title (title) (experimental)',
-            'Stock Charts',
-            groupId
-          ),
-          eyebrowText: text(
-            'L1 eyebrow text (eyebrowText) (experimental)',
-            'Eyebrow',
-            groupId
-          ),
-          eyebrowLink: text(
-            'L1 eyebrow link (eyebrowLink) (experimental)',
-            '#',
-            groupId
-          ),
+          mastheadL1Data,
         };
         return {
           ...standardProps,
-          ...mastheadL1Props,
         };
       },
     },
@@ -106,11 +119,13 @@ WithPlatform.story = {
   parameters: {
     knobs: {
       Masthead: ({ groupId }) => {
+        const useMockData = boolean('Use mock data', inPercy());
+
         const standardProps = {
           navigation: select(
             'navigation data (navigation)',
             mastheadKnobs.navigation,
-            inPercy()
+            useMockData
               ? mastheadKnobs.navigation.custom
               : mastheadKnobs.navigation.default,
             groupId

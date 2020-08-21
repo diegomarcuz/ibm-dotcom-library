@@ -5,11 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { object, text } from '@storybook/addon-knobs';
 import Image from '../Image';
 import React from 'react';
 import readme from '../README.stories.mdx';
 import settings from 'carbon-components/es/globals/js/settings';
+import { text } from '@storybook/addon-knobs';
 
 const { prefix } = settings;
 
@@ -20,28 +20,24 @@ export default {
     ...readme.parameters,
     knobs: {
       Image: ({ groupId }) => ({
-        image: object(
-          'sources:',
-          [
-            {
-              src: 'https://dummyimage.com/320x160/ee5396/161616&text=2x1',
-              breakpoint: 320,
-            },
-            {
-              src: 'https://dummyimage.com/400x400/ee5396/161616&text=1x1',
-              breakpoint: 400,
-            },
-            {
-              src: 'https://dummyimage.com/672x672/ee5396/161616&text=1x1',
-              breakpoint: 672,
-            },
-          ],
-          groupId
-        ),
-        alt: text('Image alt text (required)', 'Image alt text', groupId),
+        image: [
+          {
+            src: 'https://dummyimage.com/320x160/ee5396/161616&text=2x1',
+            breakpoint: 'sm',
+          },
+          {
+            src: 'https://dummyimage.com/400x200/ee5396/161616&text=2x1',
+            breakpoint: 'md',
+          },
+          {
+            src: 'https://dummyimage.com/672x336/ee5396/161616&text=2x1',
+            breakpoint: 'lg',
+          },
+        ],
+        alt: text('Image alt text (alt):', 'Image alt text', groupId),
         defaultSrc: text(
-          'Default image (required)',
-          'https://dummyimage.com/672x672/ee5396/161616&text=1x1',
+          'Default image (defaultSrc):',
+          'https://dummyimage.com/672x336/ee5396/161616&text=2x1',
           groupId
         ),
       }),

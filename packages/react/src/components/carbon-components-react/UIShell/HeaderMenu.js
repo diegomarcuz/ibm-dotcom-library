@@ -2,19 +2,24 @@
 /* istanbul ignore file */
 
 /**
- * Copyright IBM Corp. 2016, 2018
+ * Copyright IBM Corp. 2016, 2020
  *
  * This source code is licensed under the Apache-2.0 license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
+import classnames from 'classnames';
 import ChevronDown20 from '@carbon/icons-react/es/chevron--down/20';
 import settings from 'carbon-components/es/globals/js/settings';
 import cx from 'classnames';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { keys, matches } from '../../../internal/keyboard';
-import { AriaLabelPropType } from '../../../prop-types/AriaPropTypes';
+import {
+  keys,
+  matches,
+} from '../../../internal/vendor/carbon-components-react/internal/keyboard';
+import { AriaLabelPropType } from '../../../internal/vendor/carbon-components-react/prop-types/AriaPropTypes';
+import root from 'window-or-global';
 
 const { prefix } = settings;
 
@@ -54,10 +59,16 @@ class HeaderMenu extends React.Component {
      * Optional component to render instead of string
      */
     renderMenuContent: PropTypes.func,
+
+    /**
+     * function to toogle overlay that appears when opening menu
+     */
+    setOverlay: PropTypes.func,
   };
 
   static defaultProps = {
     renderMenuContent: defaultRenderMenuContent,
+    setOverlay: () => {},
   };
 
   constructor(props) {
@@ -76,9 +87,18 @@ class HeaderMenu extends React.Component {
    * Toggle the expanded state of the menu on click.
    */
   handleOnClick = index => {
-    this.setState(prevState => ({
-      expanded: !prevState.expanded,
-    }));
+    this.setState(prevState => {
+      if (prevState.expanded) {
+        this.props.setOverlay(false);
+        root.document.body.style.overflowY = 'auto';
+      } else {
+        this.props.setOverlay(true);
+        root.document.body.style.overflowY = 'hidden';
+      }
+      return {
+        expanded: !prevState.expanded,
+      };
+    });
   };
 
   /**
@@ -90,12 +110,26 @@ class HeaderMenu extends React.Component {
       event.stopPropagation();
       event.preventDefault();
 
-      this.setState(prevState => ({
-        expanded: !prevState.expanded,
-      }));
+      this.handleOnClick();
 
       return;
     }
+  };
+
+  /**
+   * Checks if user has tabbed to menu items within the megamenu,
+   * if so do not set overlay to false
+   */
+  checkMenuItems = event => {
+    const megamenuItems = [
+      `${prefix}--masthead__megamenu__category-headline`,
+      `${prefix}--masthead__megamenu__category-group`,
+      `${prefix}--masthead__megamenu__view-all-cta`,
+    ];
+
+    return megamenuItems.filter(item =>
+      event.relatedTarget.parentElement.className?.includes(item)
+    );
   };
 
   /**
@@ -106,6 +140,17 @@ class HeaderMenu extends React.Component {
   handleOnBlur = event => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
       this.setState({ expanded: false, selectedIndex: null });
+      root.document.body.style.overflowY = 'auto';
+    }
+
+    const megamenuItems = [
+      `${prefix}--masthead__megamenu__category-headline`,
+      `${prefix}--masthead__megamenu__menu-category`,
+      `${prefix}--masthead__megamenu__view-all-cta`,
+    ];
+
+    if (!event.relatedTarget || !this.checkMenuItems(event).length) {
+      this.props.setOverlay(false);
     }
   };
 
@@ -144,6 +189,9 @@ class HeaderMenu extends React.Component {
         selectedIndex: null,
       }));
 
+      // remove overlay
+      this.props.setOverlay(false);
+
       // Return focus to menu button when the user hits ESC.
       this.menuButtonRef.focus();
       return;
@@ -158,11 +206,13 @@ class HeaderMenu extends React.Component {
       children,
       renderMenuContent: MenuContent,
       menuLinkName,
+      autoId,
     } = this.props;
     const accessibilityLabel = {
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledBy,
     };
+
     const className = cx(`${prefix}--header__submenu`, customClassName);
     // Notes on eslint comments and based on the examples in:
     // https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-1/menubar-1.html#
@@ -174,6 +224,7 @@ class HeaderMenu extends React.Component {
     return (
       <li // eslint-disable-line jsx-a11y/mouse-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
         className={className}
+        data-autoid={autoId}
         onKeyDown={this.handleMenuClose}
         onClick={this.handleOnClick}
         onBlur={this.handleOnBlur}>

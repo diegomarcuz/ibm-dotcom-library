@@ -5,16 +5,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { altlangs, settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
 import ComposedModal, {
   ModalBody,
   ModalHeader,
 } from '../../internal/vendor/carbon-components-react/components/ComposedModal/ComposedModal';
 import React, { useEffect, useState } from 'react';
+import altlangs from '@carbon/ibmdotcom-utilities/es/utilities/altlangs/altlangs';
 import ArrowLeft20 from '@carbon/icons-react/es/arrow--left/20';
 import cx from 'classnames';
-import EarthFilled20 from '@carbon/icons-react/es/earth--filled/20';
-import { LocaleAPI } from '@carbon/ibmdotcom-services';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
+import EarthFilled16 from '@carbon/icons-react/es/earth--filled/16';
+import LocaleAPI from '@carbon/ibmdotcom-services/es/services/Locale/Locale';
 import LocaleModalCountries from './LocaleModalCountries';
 import LocaleModalRegions from './LocaleModalRegions';
 import PropTypes from 'prop-types';
@@ -51,14 +52,10 @@ const LocaleModal = ({ isOpen, setIsOpen, localeData, localeDisplay }) => {
           LocaleAPI.getLocale(),
           LocaleAPI.getLangDisplay(),
         ]);
-        if (stale) {
-          return;
-        }
-        const locale = pair[0];
-        getLangDisplay = pair[1];
-        list = locale && (await LocaleAPI.getList(locale));
-        if (stale) {
-          return;
+        if (!stale) {
+          const locale = pair[0];
+          getLangDisplay = pair[1];
+          list = locale && (await LocaleAPI.getList(locale));
         }
       }
 
@@ -68,15 +65,15 @@ const LocaleModal = ({ isOpen, setIsOpen, localeData, localeDisplay }) => {
 
       document
         .querySelector(`.${prefix}--modal-header__heading`)
-        ?.setAttribute('tabindex', '1');
+        ?.setAttribute('tabindex', '0');
 
       const localeModalContainer = document.querySelector(
         `.${prefix}--locale-modal-container .${prefix}--modal-container`
       );
 
-      localeModalContainer.setAttribute('role', 'dialog');
-      localeModalContainer.setAttribute('tabindex', '-1');
-      localeModalContainer.setAttribute('aria-modal', 'true');
+      localeModalContainer?.setAttribute('role', 'dialog');
+      localeModalContainer?.setAttribute('tabindex', '-1');
+      localeModalContainer?.setAttribute('aria-modal', 'true');
     })();
 
     // reset the country search results when clicking close icon or back to region button
@@ -97,51 +94,12 @@ const LocaleModal = ({ isOpen, setIsOpen, localeData, localeDisplay }) => {
     };
   }, [clearResults, localeData, localeDisplay]);
 
-  /**
-   *  New region/country list based lang attributes available on page
-   *
-   * @param {object} list country list
-   *
-   * @returns {object} list item
-   */
-  const sortList = list => {
-    const pageLangs = altlangs();
-    const filterList = [];
-
-    list.regionList &&
-      list.regionList.map((region, index) => {
-        filterList.push({
-          name: region.name,
-          key: region.key,
-          countries: [],
-        });
-
-        for (let [key, value] of Object.entries(pageLangs)) {
-          region.countryList.map(country => {
-            country.locale.map(loc => {
-              if (loc[0].includes(key)) {
-                filterList[index].countries.push({
-                  region: region.key,
-                  name: country.name,
-                  locale: loc[0],
-                  language: loc[1],
-                  href: value,
-                });
-              }
-            });
-          });
-        }
-
-        filterList[index].countries.sort((a, b) => (a.name > b.name ? 1 : -1));
-      });
-
-    return filterList;
-  };
-
   return (
     <ComposedModal
       open={isOpen}
-      onClose={_close}
+      onClose={() => {
+        _close(setIsOpen);
+      }}
       className={`${prefix}--locale-modal-container`}
       data-autoid={`${stablePrefix}--locale-modal`}
       selectorPrimaryFocus={`.${prefix}--modal-close`}>
@@ -162,7 +120,7 @@ const LocaleModal = ({ isOpen, setIsOpen, localeData, localeDisplay }) => {
         <ModalHeader
           label={[
             langDisplay,
-            <EarthFilled20
+            <EarthFilled16
               key="earthfilled"
               className={`${prefix}--locale-modal__label-globe`}
             />,
@@ -178,30 +136,17 @@ const LocaleModal = ({ isOpen, setIsOpen, localeData, localeDisplay }) => {
           setIsFiltering={setIsFiltering}
           setClearResults={setClearResults}
           returnButtonLabel={modalLabels.headerTitle}
+          closeModalLabel={modalLabels.modalClose}
         />
         <LocaleModalCountries
           regionList={sortList(list)}
           setClearResults={setClearResults}
+          currentRegion={currentRegion}
           {...modalLabels}
         />
       </ModalBody>
     </ComposedModal>
   );
-
-  /**
-   * Sets modal state to closed
-   *
-   * @private
-   */
-  function _close() {
-    setIsOpen(false);
-    const footerBtn = document.querySelector(
-      `.${prefix}--locale-btn__container .${prefix}--btn--secondary`
-    );
-    setTimeout(() => {
-      footerBtn?.focus();
-    }, 100);
-  }
 };
 
 LocaleModal.propTypes = {
@@ -251,6 +196,61 @@ LocaleModal.defaultProps = {
   setIsOpen: () => {},
   localeData: null,
   localeDisplay: null,
+};
+
+/**
+ *  New region/country list based lang attributes available on page
+ *
+ * @param {object} list country list
+ *
+ * @returns {object} list item
+ */
+export const sortList = list => {
+  const pageLangs = altlangs();
+  const filterList = [];
+
+  list.regionList &&
+    list.regionList.map((region, index) => {
+      filterList.push({
+        name: region.name,
+        key: region.key,
+        countries: [],
+      });
+
+      for (let [key, value] of Object.entries(pageLangs)) {
+        region.countryList.map(country => {
+          country.locale.map(loc => {
+            if (loc[0].includes(key)) {
+              filterList[index].countries.push({
+                region: region.key,
+                name: country.name,
+                locale: loc[0],
+                language: loc[1],
+                href: value,
+              });
+            }
+          });
+        });
+      }
+
+      filterList[index].countries.sort((a, b) => (a.name > b.name ? 1 : -1));
+    });
+  return filterList;
+};
+
+/**
+ * Sets modal state to closed
+ *
+ * @private
+ */
+export const _close = setIsOpen => {
+  setIsOpen(false);
+  const footerBtn = document.querySelector(
+    `.${prefix}--locale-btn__container .${prefix}--btn--secondary`
+  );
+  setTimeout(() => {
+    footerBtn?.focus();
+  }, 100);
 };
 
 export default LocaleModal;

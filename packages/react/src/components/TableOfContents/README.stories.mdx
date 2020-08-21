@@ -2,11 +2,17 @@ import { Props, Description } from '@storybook/addon-docs/blocks';
 import contributing from '../../../../../docs/contributing-license.md';
 import TableOfContents from './TableOfContents';
 
-# Sticky Table of Contents
+# Table of Contents
 
-> The Sticky Table of Contents component is to be utilized within IBM.com.
+> Table of contents display pre-defined sections of the page and provide a
+> convenient way to navigate to those sections. It also sticks to the top of the
+> page when scrolling for easy access.
 
-> 💡 Check our [CodeSandbox](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/TableOfContents) example implementation.
+> 💡 Check our
+> [CodeSandbox](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/TableOfContents)
+> example implementation.
+
+[![Edit @carbon/ibmdotcom-web-components](https://codesandbox.io/static/img/play-codesandbox.svg)](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/TableOfContents)
 
 ## Getting started
 
@@ -20,7 +26,7 @@ Here's a quick example to get you started.
 @import '@carbon/type/scss/font-face/sans';
 @include carbon--font-face-mono();
 @include carbon--font-face-sans();
-@import '@carbon/ibmdotcom-styles/scss/components/tableofcontents';
+@import '@carbon/ibmdotcom-styles/scss/components/tableofcontents/index';
 ```
 
 > 💡 Only import fonts once per usage. Don't forget to import the

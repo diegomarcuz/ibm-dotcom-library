@@ -5,13 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 import ArrowDown20 from '@carbon/icons-react/es/arrow--down/20';
+import ArrowLeft20 from '@carbon/icons-react/es/arrow--left/20';
 import ArrowRight20 from '@carbon/icons-react/es/arrow--right/20';
 import Download20 from '@carbon/icons-react/es/download/20';
 import Launch20 from '@carbon/icons-react/es/launch/20';
 import { LightboxMediaViewer } from '../LightboxMediaViewer';
 import PlayOutline20 from '@carbon/icons-react/es/play--outline/20';
 import React from 'react';
-import { smoothScroll } from '@carbon/ibmdotcom-utilities';
+import smoothScroll from '@carbon/ibmdotcom-utilities/es/utilities/smoothScroll/smoothScroll';
 
 /**
  * The logic behind the CTA component
@@ -73,7 +74,7 @@ class CTALogic {
    * @param {string} type cta type ( external | jump | local)
    * @returns {*} cta type component
    */
-  static iconSelector(type) {
+  static iconSelector(type, iconPlacement) {
     switch (type) {
       case 'download':
         return Download20;
@@ -86,7 +87,7 @@ class CTALogic {
       case 'default':
         return null;
       default:
-        return ArrowRight20;
+        return iconPlacement === 'left' ? ArrowLeft20 : ArrowRight20;
     }
   }
 

@@ -7,9 +7,9 @@
 
 import { CTA } from '../../../components/CTA';
 import cx from 'classnames';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import { ImageWithCaption } from '../../../components/ImageWithCaption';
-import { markdownToHtml } from '@carbon/ibmdotcom-utilities';
+import markdownToHtml from '@carbon/ibmdotcom-utilities/es/utilities/markdownToHtml/markdownToHtml';
 import PropTypes from 'prop-types';
 import React from 'react';
 import settings from 'carbon-components/es/globals/js/settings';
@@ -143,23 +143,21 @@ ContentItem.propTypes = {
   mediaData: PropTypes.oneOfType([
     PropTypes.shape({
       inverse: PropTypes.bool,
-      image: PropTypes.shape(
-        PropTypes.shape({
-          classname: PropTypes.string,
-          sources: PropTypes.arrayOf(
-            PropTypes.shape({
-              src: PropTypes.string,
-              breakpoint: PropTypes.oneOfType([
-                PropTypes.string,
-                PropTypes.number,
-              ]),
-            })
-          ),
-          defaultSrc: PropTypes.string.isRequired,
-          alt: PropTypes.string.isRequired,
-          longDescription: PropTypes.string,
-        })
-      ).isRequired,
+      image: PropTypes.shape({
+        classname: PropTypes.string,
+        sources: PropTypes.arrayOf(
+          PropTypes.shape({
+            src: PropTypes.string,
+            breakpoint: PropTypes.oneOfType([
+              PropTypes.string,
+              PropTypes.number,
+            ]),
+          })
+        ),
+        defaultSrc: PropTypes.string.isRequired,
+        alt: PropTypes.string.isRequired,
+        longDescription: PropTypes.string,
+      }).isRequired,
       lightbox: PropTypes.bool,
       heading: PropTypes.string,
       copy: PropTypes.string,

@@ -6,7 +6,7 @@
  */
 
 import { CTA } from '../CTA';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import PropTypes from 'prop-types';
 import React from 'react';
 import settings from 'carbon-components/es/globals/js/settings';
@@ -22,15 +22,13 @@ const { prefix } = settings;
  * @param {Array} props.items array of item
  * @returns {*} JSX LinkList component
  */
-const LinkList = ({ heading, items, style }) => {
+const LinkList = ({ heading, iconPlacement, items, style }) => {
   const linkStyle = style === 'card' ? 'card' : 'text';
   return (
     <div
       className={`${prefix}--link-list`}
       data-autoid={`${stablePrefix}--link-list`}>
-      {heading && (
-        <h4 className={`${prefix}--link-list__heading`}>{heading}</h4>
-      )}
+      <h4 className={`${prefix}--link-list__heading`}>{heading}</h4>
 
       <ul
         className={`${prefix}--link-list__list ${prefix}--link-list__list--${style}`}>
@@ -39,7 +37,13 @@ const LinkList = ({ heading, items, style }) => {
             <li
               className={`${prefix}--link-list__list__CTA ${prefix}--link-list__list--${cta.type}`}
               key={index}>
-              <CTA style={linkStyle} {...cta} disableImage={true} />
+              <CTA
+                style={linkStyle}
+                {...cta}
+                disableImage={true}
+                {...(iconPlacement &&
+                  linkStyle === 'text' && { iconPlacement })}
+              />
             </li>
           );
         })}
@@ -81,9 +85,15 @@ LinkList.propTypes = {
   ).isRequired,
 
   /**
+   * Icon placement.
+   */
+  iconPlacement: PropTypes.oneOf(['left', 'right']),
+
+  /**
    * Orientation of LinkList.
    */
-  style: PropTypes.oneOf(['card', 'horizontal', 'vertical']).isRequired,
+  style: PropTypes.oneOf(['card', 'horizontal', 'vertical', 'vertical-end'])
+    .isRequired,
 };
 
 export default LinkList;

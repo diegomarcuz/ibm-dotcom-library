@@ -18,7 +18,7 @@ import {
   LogoGrid,
   FeatureCardBlockLarge,
   TableOfContents,
-} from '../../../../../';
+} from '../../../../index';
 
 import { ArrowRight20 } from '@carbon/icons-react';
 import React from 'react';
@@ -28,7 +28,7 @@ import React from 'react';
  *
  * @returns {*} JSX for Learn template
  */
-const content = (
+const Content = () => (
   <>
     <TableOfContents menuLabel="Jump to" theme="white">
       <a name="section-1" data-title="Lorem ipsum dolor sit amet" />
@@ -230,8 +230,7 @@ const content = (
         copy="Porttitor eget dolor morbi non arcu. Et ligula ullamcorper malesuada proin libero nunc consequat. In est ante in nibh mauris cursus mattis. Turpis tincidunt id aliquet risus feugiat in. Vel facilisis volutpat est velit egestas dui."
         mediaType="video"
         mediaData={{
-          src: '0_uka1msg4',
-          type: 'video',
+          videoId: '0_uka1msg4',
         }}
       />
 
@@ -243,8 +242,9 @@ const content = (
             eyebrow: 'Lorem ipsum',
             heading: 'Aliquam condimentum',
             copy:
-              'Lorem ipsum dolor sit amet, _consectetur_ sellus at elit sollicitudin.',
+              'Lorem ipsum dolor sit amet, _consectetur_ adipiscing elit. Aenean et ultricies est. Mauris iaculis eget dolor nec hendrerit. Phasellus at elit sollicitudin.',
             cta: {
+              heading: 'Aliquam condimentum',
               items: [
                 {
                   type: 'local',
@@ -265,6 +265,7 @@ const content = (
             copy:
               'Lorem ipsum dolor sit amet, _consectetur_ adipiscing elit. Aenean et ultricies est. Mauris iaculis eget dolor nec hendrerit. Phasellus at elit sollicitudin.',
             cta: {
+              heading: 'Aliquam condimentum',
               items: [
                 {
                   type: 'local',
@@ -385,46 +386,51 @@ const content = (
         }}
       />
     </TableOfContents>
-    <CTASection
-      theme="g10"
-      cta={{
-        style: 'button',
-        type: 'local',
-        buttons: [
-          {
-            type: 'local',
-            copy: ['Contact sales'],
-          },
-        ],
-      }}
-      items={[
-        {
-          heading: 'Get connected',
-          copy: `
-            IBM DevOps partners have a wide range of expertise.
-            Find one to build the right solution for you.
-            `,
-          cta: {
-            copy: 'Find a partner',
-            type: 'local',
-            href: 'https://example.com/',
-          },
-        },
-        {
-          heading: 'Learn how',
-          copy:
-            'Dig into more self-directed learning about DevOps methodologies.',
-          cta: {
-            copy: 'Browse tutorials',
-            type: 'local',
-            href: 'https://example.com/',
-          },
-        },
-      ]}
-      heading="Take the next step"
-      copy="Want to discuss your options with a DevOps expert? Contact our sales team to evaluate your needs."
-    />
+    <div className="bx--grid" style={{ backgroundColor: '#f4f4f4' }}>
+      <div className="bx--row">
+        <div className="bx--col-sm-4 bx--col-lg-12 bx--offset-lg-4">
+          <CTASection
+            theme="g10"
+            cta={{
+              style: 'button',
+              type: 'local',
+              buttons: [
+                {
+                  type: 'local',
+                  copy: 'Contact sales',
+                  href: 'https://example.com/',
+                },
+              ],
+            }}
+            items={[
+              {
+                heading: 'Get connected',
+                copy:
+                  'IBM DevOps partners have a wide range of expertise. Find one to build the right solution for you.',
+                cta: {
+                  copy: 'Find a partner',
+                  type: 'local',
+                  href: 'https://example.com/',
+                },
+              },
+              {
+                heading: 'Learn how',
+                copy:
+                  'Dig into more self-directed learning about DevOps methodologies.',
+                cta: {
+                  copy: 'Browse tutorials',
+                  type: 'local',
+                  href: 'https://example.com/',
+                },
+              },
+            ]}
+            heading="Take the next step"
+            copy="Want to discuss your options with a DevOps expert? Contact our sales team to evaluate your needs."
+          />
+        </div>
+      </div>
+    </div>
   </>
 );
 
-export default content;
+export default Content;

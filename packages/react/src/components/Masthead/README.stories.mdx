@@ -9,6 +9,12 @@ import Masthead from './Masthead';
 > displays consistently at the top of each page. It also includes search and
 > profile services for IBM.com.
 
+> 💡 Check our
+> [CodeSandbox](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/Masthead)
+> example implementation.
+
+[![Edit @carbon/ibmdotcom-web-components](https://codesandbox.io/static/img/play-codesandbox.svg)](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/Masthead)
+
 ## Getting started
 
 Here's a quick example to get you started.
@@ -21,7 +27,7 @@ Here's a quick example to get you started.
 @import '@carbon/type/scss/font-face/sans';
 @include carbon--font-face-mono();
 @include carbon--font-face-sans();
-@import '@carbon/ibmdotcom-styles/scss/components/masthead/masthead.scss';
+@import '@carbon/ibmdotcom-styles/scss/components/masthead/masthead';
 ```
 
 > 💡 Only import fonts once per usage. Don't forget to import the Masthead
@@ -86,19 +92,34 @@ const platformData = {
 
 ## Stable selectors
 
-| Name                                                       | Description |
-| ---------------------------------------------------------- | ----------- |
-| `dds--masthead`                                            | Component   |
-| `dds--masthead__hamburger`                                 | Interactive |
-| `dds--masthead__logo`                                      | Interactive |
-| `dds--masthead__platform-name`                             | Interactive |
-| `dds--masthead__l0-nav`                                    | Component   |
-| `dds--masthead__l0-nav--nav-${item}`                       | Interactive |
-| `dds--masthead__l0-nav--subnav-col${item}-item${item}`     | Interactive |
-| `dds--masthead__l0-sidenav`                                | Component   |
-| `dds--masthead__l0-sidenav--nav-${item}`                   | Interactive |
-| `dds--masthead__l0-sidenav--subnav-col${item}-item${item}` | Interactive |
+| Name                                                                     | Description |
+| ------------------------------------------------------------------------ | ----------- |
+| `dds--masthead`                                                          | Component   |
+| `dds--masthead__hamburger`                                               | Interactive |
+| `dds--masthead-${navType}__l0-logo`                                      | Interactive |
+| `dds--masthead-${navType}__l0-search`                                    | Interactive |
+| `dds--masthead-${navType}__l0-search--close`                             | Interactive |
+| `dds--masthead-${navType}__l0-account`                                   | Interactive |
+| `dds--masthead-${navType}__l0-ecosystemname`                             | Interactive |
+| `dds--masthead-${navType}__l1--platformname`                             | Interactive |
+| `dds--masthead__megamenu`                                                | Component   |
+| `dds--masthead-${navType}__l${level}-nav${item}`                         | Interactive |
+| `dds--masthead-${navType}__l${level}-nav${item}-list${item}`             | Interactive |
+| `dds--masthead-${navType}__l${level}-nav${item}-list${item}-item${item}` | Interactive |
+| `dds--masthead__l{level}-nav`                                            | Component   |
+| `dds--masthead-${navType}__l1-nav${item}`                                | Interactive |
+| `dds--masthead-${navType}__l1-nav${item}-item${item}`                    | Interactive |
+| `dds--masthead-${navType}__l0-sidenav`                                   | Component   |
+| `dds--masthead-${navType}__l0-sidenav-nav${item}`                        | Interactive |
+| `dds--masthead__l0-sidenav--subnav-col${item}-item${item}`               | Interactive |
+| `dds--masthead__l0-sidenav--subnav-col${item}-item${item}`               | Interactive |
+| `dds--masthead__l1`                                                      | Component   |
+| `dds--masthead__l1--short`                                               | Interactive |
+| `dds--masthead-${navType}__l1--name-platformname`                        | Interactive |
+| `dds--masthead__l1-nav`                                                  | Component   |
+
+\*\* All these selectors belongs to the `MastheadL1` component, which is
+experimental and is behind a feature flag.
 
 <Description markdown={corsproxy} />
-
 <Description markdown={contributing} />

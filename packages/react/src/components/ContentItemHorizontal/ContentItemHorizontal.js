@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import { LinkList } from '../LinkList';
-import { markdownToHtml } from '@carbon/ibmdotcom-utilities';
+import markdownToHtml from '@carbon/ibmdotcom-utilities/es/utilities/markdownToHtml/markdownToHtml';
 import PropTypes from 'prop-types';
 import React from 'react';
 import settings from 'carbon-components/es/globals/js/settings';
@@ -28,7 +28,7 @@ const { prefix } = settings;
  */
 const ContentItemHorizontal = ({ eyebrow, heading, copy, cta }) => (
   <div
-    className={`${prefix}--content-item-horizontal__item ${prefix}`}
+    className={`${prefix}--content-item-horizontal__item `}
     data-autoid={`${stablePrefix}--content-item-horizontal__item`}>
     <div className={`${prefix}--content-item-horizontal__row`}>
       <div className={`${prefix}--content-item-horizontal__col`}>
@@ -57,7 +57,7 @@ const ContentItemHorizontal = ({ eyebrow, heading, copy, cta }) => (
           <div
             className={`${prefix}--content-item-horizontal__item--cta`}
             data-autoid={`${stablePrefix}--content-item-horizontal__item--cta`}>
-            <LinkList style="horizontal" {...cta} />
+            <LinkList style="vertical" {...cta} />
           </div>
         )}
       </div>
@@ -91,13 +91,21 @@ ContentItemHorizontal.propTypes = {
    * | `copy` | YES      | String    | Link text.                                 |
    * | `href` | YES      | String    | URI for internal or external resource.     |
    */
-  cta: PropTypes.arrayOf(
-    PropTypes.shape({
-      type: PropTypes.oneOf(['local', 'external']).isRequired,
-      href: PropTypes.string.isRequired,
-      copy: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  cta: PropTypes.shape({
+    heading: PropTypes.string,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        type: PropTypes.oneOfType([
+          PropTypes.oneOf(['local', 'external']),
+          PropTypes.arrayOf(PropTypes.oneOf(['local', 'external'])),
+        ]),
+        copy: PropTypes.string,
+        href: PropTypes.string,
+        customClassName: PropTypes.string,
+      })
+    ).isRequired,
+    iconPlacement: PropTypes.oneOf(['left', 'right']),
+  }),
 };
 
 export default ContentItemHorizontal;

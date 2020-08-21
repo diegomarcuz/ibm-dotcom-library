@@ -5,34 +5,31 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { object, text, boolean } from '@storybook/addon-knobs';
-import dataContent from './data/dataContent';
+import { text, boolean } from '@storybook/addon-knobs';
+import DataContent from './data/DataContent';
+import Image from '../../Image/Image';
 import React from 'react';
 import readme from '../README.stories.mdx';
 import TableOfContents from '../TableOfContents';
 
-const defaultMenuItems = [
+const sources = [
   {
-    title: 'Cras molestie condimentum',
-    id: '8',
+    src: 'https://dummyimage.com/672x200&text=Example%20Children',
+    breakpoint: 400,
   },
   {
-    title: 'Praesent fermentum sodales',
-    id: '7',
+    src: 'https://dummyimage.com/672x200&text=Example%20Children',
+    breakpoint: 672,
   },
   {
-    title: 'Nulla tristique lacinia',
-    id: '2',
-  },
-  {
-    title: 'Morbi id nibh metus',
-    id: '3',
-  },
-  {
-    title: 'Integer non scelerisque',
-    id: '14',
+    src: 'https://dummyimage.com/672x672&text=Example%20Children',
+    breakpoint: 1056,
   },
 ];
+
+const defaultSrc = 'https://dummyimage.com/672x672';
+const alt = 'Lorem Ipsum';
+const longDescription = 'Lorem Ipsum Dolor';
 
 export default {
   title: 'Components|Table of Contents',
@@ -45,7 +42,8 @@ export default {
 export const ManuallyDefineMenuItems = ({ parameters }) => {
   const { menuItems, menuLabel, menuRule, headingContent } =
     parameters?.props?.TableOfContents ?? {};
-  const theme = document.documentElement.getAttribute('storybook-carbon-theme');
+  const theme =
+    document.documentElement.getAttribute('storybook-carbon-theme') || 'white';
   return (
     <TableOfContents
       theme={theme}
@@ -53,7 +51,7 @@ export const ManuallyDefineMenuItems = ({ parameters }) => {
       menuLabel={menuLabel}
       menuRule={menuRule}
       headingContent={headingContent}>
-      {dataContent}
+      <DataContent />
     </TableOfContents>
   );
 };
@@ -63,9 +61,8 @@ ManuallyDefineMenuItems.story = {
   parameters: {
     knobs: {
       TableOfContents: ({ groupId }) => ({
-        menuItems: object('menuItems', defaultMenuItems, groupId),
-        menuLabel: text('menu label', 'Jump to', groupId),
-        menuRule: boolean('Optional Rule', false, groupId),
+        menuLabel: text('Menu label (menuLabel)', 'Jump to', groupId),
+        menuRule: boolean('Optional Rule (menuRule)', false, groupId),
       }),
     },
   },
@@ -79,7 +76,7 @@ DynamicItems.story = {
   parameters: {
     knobs: {
       TableOfContents: ({ groupId }) => ({
-        menuLabel: text('menu label', 'Jump to', groupId),
+        menuLabel: text('Menu label (menuLabel)', 'Jump to', groupId),
       }),
     },
   },
@@ -93,20 +90,21 @@ WithHeadingContent.story = {
   parameters: {
     knobs: {
       TableOfContents: ({ groupId }) => ({
-        menuItems: object('menuItems', defaultMenuItems, groupId),
-        menuLabel: text('menu label', 'Jump to', groupId),
-        menuRule: boolean('Optional Rule', false, groupId),
+        menuLabel: text('Menu label (menuLabel)', 'Jump to', groupId),
+        menuRule: boolean('Optional Rule (menuRule)', false, groupId),
         headingContent: (
-          <div
+          <Image
+            sources={sources}
+            defaultSrc={defaultSrc}
+            alt={alt}
+            longDescription={longDescription}
             style={{
-              background: '#f4f4f4',
               height: '200px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
-            <h4>Example children</h4>
-          </div>
+            }}
+          />
         ),
       }),
     },

@@ -14,17 +14,16 @@
 
   .#{$prefix}--buttongroup {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
 
     @include carbon--breakpoint(lg) {
-      justify-content: flex-end;
-      flex-direction: row-reverse;
+      flex-direction: row;
     }
 
     .#{$prefix}--btn {
       font-size: 1rem;
       position: relative;
-      width: 100%;
+      width: auto;
       height: 100%;
       word-break: break-word;
       transition: all $duration--fast-01 motion(entrance, productive), width 0s,
@@ -33,6 +32,10 @@
         width: auto;
         height: auto;
       }
+    }
+
+    .#{$prefix}--btn--multiline {
+      align-items: start;
     }
   }
 

@@ -7,11 +7,12 @@
 
 import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import PropTypes from 'prop-types';
 import settings from 'carbon-components/es/globals/js/settings';
+import uniqueid from '@carbon/ibmdotcom-utilities/es/utilities/uniqueid/uniqueid';
 import VideoImageOverlay from './VideoImageOverlay';
-import { VideoPlayerAPI } from '@carbon/ibmdotcom-services';
+import VideoPlayerAPI from '@carbon/ibmdotcom-services/es/services/VideoPlayer/VideoPlayer';
 
 const { stablePrefix } = ddsSettings;
 const { prefix } = settings;
@@ -20,17 +21,17 @@ const { prefix } = settings;
  * VideoPlayer component.
  */
 const VideoPlayer = ({
-  inverse,
   showCaption,
   videoId,
   customClassName,
   autoPlay,
+  aspectRatio,
 }) => {
   const [videoData, setVideoData] = useState({ description: '', name: '' });
 
   // embedVideo is set to true when overlay thumbnail is clicked
   const [embedVideo, setEmbedVideo] = useState(false);
-  const videoPlayerId = `video-player__video-${videoId}`;
+  const videoPlayerId = uniqueid(`video-player__video-${videoId}-`);
   const videoDuration = VideoPlayerAPI.getVideoDuration(videoData.msDuration);
 
   useEffect(() => {
@@ -57,19 +58,19 @@ const VideoPlayer = ({
     };
   }, [autoPlay, videoId, videoPlayerId, embedVideo]);
 
-  const classnames = cx(
-    `${prefix}--video-player`,
-    { [`${prefix}--video-player--inverse`]: inverse },
-    customClassName
-  );
+  const classnames = cx(`${prefix}--video-player`, customClassName);
+
+  const aspectRatioClass = cx({
+    [`${prefix}--video-player__aspect-ratio--${aspectRatio}`]: aspectRatio,
+  });
 
   return (
     <div
       aria-label={`${videoData.name} ${videoDuration}`}
       className={classnames}>
       <div
-        className={`${prefix}--video-player__video-container`}
-        data-autoid={`${stablePrefix}--${videoPlayerId}`}>
+        className={`${prefix}--video-player__video-container ${aspectRatioClass}`}
+        data-autoid={`${stablePrefix}--video-player__video-${videoId}`}>
         <div
           className={`${prefix}--video-player__video`}
           id={`${prefix}--${videoPlayerId}`}>
@@ -97,6 +98,13 @@ VideoPlayer.propTypes = {
    */
   autoPlay: PropTypes.bool,
   /**
+   * Override default aspect ratio of `16x9`.
+   * Available aspect ratios:
+   *
+   * `16x9`, `9x16`, `2x1`, `1x2`, `4x3`, `3x4`, `1x1`
+   */
+  aspectRatio: PropTypes.string,
+  /**
    * The CSS class name to apply.
    */
   customClassName: PropTypes.string,
@@ -110,11 +118,6 @@ VideoPlayer.propTypes = {
    * `true` to show the description.
    */
   showCaption: PropTypes.bool,
-
-  /**
-   * `true` to use the inverse theme.
-   */
-  inverse: PropTypes.bool,
 };
 
 VideoPlayer.defaultProps = {

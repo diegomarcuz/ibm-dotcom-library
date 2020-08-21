@@ -4,22 +4,20 @@
  * This source code is licensed under the Apache-2.0 license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import {
-  globalInit,
-  LocaleAPI,
-  TranslationAPI,
-} from '@carbon/ibmdotcom-services';
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { DDS_LANGUAGE_SELECTOR } from '../../internal/FeatureFlags';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import FooterLogo from './FooterLogo';
 import FooterNav from './FooterNav';
+import { globalInit } from '@carbon/ibmdotcom-services/es/services/global/global';
 import LanguageSelector from './LanguageSelector';
 import LegalNav from './LegalNav';
+import LocaleAPI from '@carbon/ibmdotcom-services/es/services/Locale/Locale';
 import LocaleButton from './LocaleButton';
 import PropTypes from 'prop-types';
 import settings from 'carbon-components/es/globals/js/settings';
+import TranslationAPI from '@carbon/ibmdotcom-services/es/services/Translation/Translation';
 
 const { stablePrefix } = ddsSettings;
 const { prefix } = settings;
@@ -51,10 +49,14 @@ const Footer = ({
     let stale = false;
     if (!navigation) {
       (async () => {
-        const response = await TranslationAPI.getTranslation();
-        if (!stale) {
-          setFooterMenuData(response.footerMenu);
-          setFooterLegalData(response.footerThin);
+        try {
+          const response = await TranslationAPI.getTranslation();
+          if (!stale) {
+            setFooterMenuData(response.footerMenu);
+            setFooterLegalData(response.footerThin);
+          }
+        } catch (error) {
+          console.error('Error populating footer data:', error);
         }
       })();
     }
@@ -95,23 +97,43 @@ const Footer = ({
   return (
     <footer
       data-autoid={`${stablePrefix}--footer`}
-      className={classNames(`${prefix}--footer`, _setFooterType(type))}>
+      className={classNames(`${prefix}--footer`, {
+        [`${prefix}--footer--short`]: type === 'short',
+        [`${prefix}--footer--micro`]: type === 'micro',
+      })}>
       <section className={`${prefix}--footer__main`}>
         <div className={`${prefix}--footer__main-container`}>
-          <FooterLogo />
-          {_optionalFooterNav(type, footerMenuData)}
-          {_loadLocaleLanguage(
-            disableLocaleButton,
-            localeButtonAria,
-            displayLang,
-            languageOnly,
-            languageItems,
-            languageInitialItem,
-            languageCallback
-          )}
+          {type !== 'micro' && <FooterLogo />}
+          {type === undefined && <FooterNav groups={footerMenuData} />}
+          {type !== 'micro' &&
+            _loadLocaleLanguage(
+              disableLocaleButton,
+              localeButtonAria,
+              displayLang,
+              languageOnly,
+              languageItems,
+              languageInitialItem,
+              languageCallback
+            )}
         </div>
       </section>
-      <LegalNav links={footerLegalData} />
+      <LegalNav
+        links={footerLegalData}
+        type={type}
+        button={
+          type === 'micro'
+            ? _loadLocaleLanguage(
+                disableLocaleButton,
+                localeButtonAria,
+                displayLang,
+                languageOnly,
+                languageItems,
+                languageInitialItem,
+                languageCallback
+              )
+            : null
+        }
+      />
     </footer>
   );
 };
@@ -153,37 +175,6 @@ function _loadLocaleLanguage(
   }
 }
 
-/**
- * renders optional footer nav for tall
- *
- * @param {string} type type of footer in use
- * @param {string} data footer menu data
- * @returns {object} JSX object
- * @private
- */
-function _optionalFooterNav(type, data) {
-  if (type !== 'short') {
-    return <FooterNav groups={data} />;
-  }
-}
-
-/**
- * sets the footer type
- *
- * @param {string} type type of footer in use
- * @returns {object} JSX object
- * @private
- */
-function _setFooterType(type) {
-  let typeClassName;
-
-  if (type === 'short') {
-    typeClassName = `${prefix}--footer--short`;
-  }
-
-  return typeClassName;
-}
-
 Footer.propTypes = {
   /**
    * Navigation data object for Footer, used for server-side rendering.
@@ -215,8 +206,9 @@ Footer.propTypes = {
    * | ------- | --------------------------------------------------------------------------- |
    * | `tall`  | Default footer variant includes additional navigation taking up more space. |
    * | `short` | Short footer variant reduces space by removing any additional navigation.   |
+   * | `micro` | Micro footer variant includes legal navigation and locale button only.      |
    */
-  type: PropTypes.oneOf(['tall', 'short']),
+  type: PropTypes.oneOf(['tall', 'short', 'micro']),
 
   /**
    * Language code for fetching the display name.

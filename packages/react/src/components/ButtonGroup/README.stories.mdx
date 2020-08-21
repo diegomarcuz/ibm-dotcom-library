@@ -4,8 +4,14 @@ import ButtonGroup from './ButtonGroup';
 
 # Button Group
 
-> The button group component is to be utilized within IBM.com for grouping two
-> or more Button components together.
+> Use button groups when you want to display multiple buttons, such as in a
+> call-to-action.
+
+> 💡 Check our
+> [CodeSandbox](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/ButtonGroup)
+> example implementation.
+
+[![Edit @carbon/ibmdotcom-web-components](https://codesandbox.io/static/img/play-codesandbox.svg)](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/ButtonGroup)
 
 ## Getting started
 
@@ -31,6 +37,9 @@ Here's a quick example to get you started.
 This is the base example 'ButtonGroup'. Note, the buttons will not resize based
 on text size.
 
+> 💡 If the button is the last button or the only button in the button group, it
+> will be a primary button.
+
 ##### JS
 
 ```javascript
@@ -46,12 +55,12 @@ function App() {
       buttons={[
         {
           href: 'https://example.com',
-          copy: 'Primary action button',
+          copy: 'Secondary action button',
           renderIcon: ArrowDown20,
         },
         {
           href: 'https://example.com',
-          copy: 'Secondary action button',
+          copy: 'Primary action button',
           renderIcon: ArrowRight20,
         },
       ]}
@@ -91,12 +100,12 @@ function App() {
             buttons={[
               {
                 href: 'https://example.com',
-                copy: 'Primary action button',
+                copy: 'Secondary action button',
                 renderIcon: ArrowDown20,
               },
               {
                 href: 'https://example.com',
-                copy: 'Secondary action button',
+                copy: 'Primary action button',
                 renderIcon: ArrowRight20,
               },
             ]}
@@ -122,7 +131,5 @@ ReactDOM.render(<App />, document.querySelector('#app'));
 | ---------------------------- | ------------------------------------------- |
 | `dds--button-group`          | `ButtonGroup` wrapper layer                 |
 | `dds--button-group-${index}` | `Button` component within the `ButtonGroup` |
-
-
 
 <Description markdown={contributing} />

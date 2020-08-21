@@ -5,15 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {
-  ProfileAPI,
-  TranslationAPI,
-  globalInit,
-} from '@carbon/ibmdotcom-services';
+import { baseFontSize, breakpoints } from '@carbon/layout';
 import React, { useEffect, useRef, useState } from 'react';
+import calculateTotalWidth from '@carbon/ibmdotcom-utilities/es/utilities/calculateTotalWidth/calculateTotalWidth';
 import cx from 'classnames';
 import { DDS_MASTHEAD_L1 } from '../../internal/FeatureFlags';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
+import { globalInit } from '@carbon/ibmdotcom-services/es/services/global/global';
 import Header from '../../internal/vendor/carbon-components-react/components/UIShell/Header';
 import HeaderContainer from '../../internal/vendor/carbon-components-react/components/UIShell/HeaderContainer';
 import HeaderGlobalBar from '../../internal/vendor/carbon-components-react/components/UIShell/HeaderGlobalBar';
@@ -24,10 +22,12 @@ import MastheadLeftNav from './MastheadLeftNav';
 import MastheadProfile from './MastheadProfile';
 import MastheadSearch from './MastheadSearch';
 import MastheadTopNav from './MastheadTopNav';
+import ProfileAPI from '@carbon/ibmdotcom-services/es/services/Profile/Profile';
 import PropTypes from 'prop-types';
 import root from 'window-or-global';
 import settings from 'carbon-components/es/globals/js/settings';
 import SkipToContent from '../../internal/vendor/carbon-components-react/components/UIShell/SkipToContent';
+import TranslationAPI from '@carbon/ibmdotcom-services/es/services/Translation/Translation';
 import User20 from '@carbon/icons-react/es/user/20';
 import UserOnline20 from '@carbon/icons-react/es/user--online/20';
 
@@ -56,9 +56,7 @@ const Masthead = ({
   searchOpenOnload,
   placeHolderText,
   platform,
-  title,
-  eyebrowText,
-  eyebrowLink,
+  mastheadL1Data,
   ...mastheadProps
 }) => {
   /**
@@ -96,10 +94,14 @@ const Masthead = ({
   useEffect(() => {
     let unmounted = false;
     (async () => {
-      const pageData = await TranslationAPI.getTranslation();
-      if (!unmounted) {
-        setMastheadData(pageData.mastheadNav.links);
-        setProfileData(pageData.profileMenu);
+      try {
+        const pageData = await TranslationAPI.getTranslation();
+        if (!unmounted) {
+          setMastheadData(pageData.mastheadNav.links);
+          setProfileData(pageData.profileMenu);
+        }
+      } catch (error) {
+        console.error('Error populating masthead data:', error);
       }
     })();
     return () => {
@@ -169,39 +171,129 @@ const Masthead = ({
     }
   }
 
+  /**
+   * Determines whether to add class to masthead to hide nav items and
+   * display hamburger menu instead to prevent overlapping of menu items
+   */
+  const [hideNavItems, setHideNavItems] = useState(false);
+
+  /**
+   * set nav items to hide/show depending if the window size is smaller/larger to
+   * the total width of the masthead items calculated previously
+   *
+   * @param {object} mediaQuery MediaQueryList object
+   */
+  const hideShowNavItems = mediaQuery => {
+    if (mediaQuery.matches) {
+      setHideNavItems(true);
+    } else {
+      setHideNavItems(false);
+    }
+  };
+
+  const lgBreakpoint = parseFloat(breakpoints.lg.width) * baseFontSize;
+
+  /**
+   * check window size to determine whether to trigger hide/show nav item function
+   */
+  const onResize = () => {
+    if (root.innerWidth >= lgBreakpoint) {
+      /**
+       * get total width of masthead items (logo, nav menu items, search icons) and set css media query
+       * in order to hide nav menu items at the width and show hamburger menu. This prevents menu items
+       * from overlapping
+       */
+      const width = calculateTotalWidth([
+        'bx--header__logo',
+        'bx--header__nav-container',
+        'bx--masthead__platform-name',
+        'bx--header__search--actions',
+        'bx--header__global',
+      ]);
+
+      if (width > lgBreakpoint) {
+        const mediaQuery = root.matchMedia(
+          `(min-width: ${lgBreakpoint}px) and (max-width: ${width + 50}px)`
+        );
+        hideShowNavItems(mediaQuery);
+        mediaQuery.addListener(hideShowNavItems);
+
+        return () => {
+          mediaQuery.removeListener(hideShowNavItems);
+        };
+      }
+    }
+  };
+
+  useEffect(() => {
+    onResize();
+    root.document.addEventListener('resize', onResize);
+
+    return () => {
+      root.document.removeEventListener('resize', onResize);
+    };
+  });
+
+  // set navigation type (default, alternate, or ecosystem) for autoids
+  let navType;
+  if (!navigation && !platform) {
+    navType = 'alt';
+  } else if (navigation && !platform) {
+    navType = 'default';
+  } else if (platform) {
+    navType = 'eco';
+  }
+
   return (
     <HeaderContainer
       render={({ isSideNavExpanded, onClickSideNavExpand }) => (
         <div
-          className={`${prefix}--masthead ${mastheadSticky}`}
+          className={cx(`${prefix}--masthead ${mastheadSticky}`, {
+            [`${prefix}--masthead--hide-items`]: hideNavItems,
+          })}
           ref={stickyRef}>
           <div className={`${prefix}--masthead__l0`}>
             <Header aria-label="IBM" data-autoid={`${stablePrefix}--masthead`}>
               <SkipToContent />
 
-              {navigation && (
+              {(mastheadL1Data || navigation) && (
                 <HeaderMenuButton
-                  aria-label="Open menu"
-                  data-autoid={`${stablePrefix}--masthead__hamburger`}
+                  aria-label={isSideNavExpanded ? 'Close menu' : 'Open menu'}
+                  data-autoid={`${stablePrefix}--masthead-${navType}-sidenav__l0-menu`}
                   onClick={onClickSideNavExpand}
                   isActive={isSideNavExpanded}
                 />
               )}
 
-              <IbmLogo />
+              {(navigation || mastheadL1Data) && isSideNavExpanded && (
+                <MastheadLeftNav
+                  {...mastheadProps}
+                  backButtonText="Back"
+                  platform={platform}
+                  navigation={mastheadL1Data?.navigationL1 ?? mastheadData}
+                  isSideNavExpanded={isSideNavExpanded}
+                  navType={navType}
+                />
+              )}
+
+              <IbmLogo
+                autoid={`${stablePrefix}--masthead-${navType}__l0-logo`}
+              />
 
               <div className={`${prefix}--header__search ${hasPlatform}`}>
-                {navigation && (
+                {navigation && !mastheadL1Data && (
                   <MastheadTopNav
                     {...mastheadProps}
                     platform={platform}
                     navigation={mastheadData}
+                    navType={navType}
                   />
                 )}
                 {hasSearch && (
                   <MastheadSearch
                     searchOpenOnload={searchOpenOnload}
                     placeHolderText={placeHolderText}
+                    navType={navType}
                   />
                 )}
               </div>
@@ -211,7 +303,7 @@ const Masthead = ({
                   <MastheadProfile
                     overflowMenuProps={{
                       ariaLabel: 'User Profile',
-                      'data-autoid': `${stablePrefix}--masthead__profile`,
+                      'data-autoid': `${stablePrefix}--masthead-${navType}__l0-account`,
                       flipped: true,
                       style: { width: '3rem' },
                       onOpen: () => _setProfileListPosition(),
@@ -226,26 +318,18 @@ const Masthead = ({
                         ? profileData.signedin
                         : profileData.signedout
                     }
+                    navType={navType}
                   />
                 </HeaderGlobalBar>
               )}
-
-              {navigation && (
-                <MastheadLeftNav
-                  {...mastheadProps}
-                  navigation={mastheadData}
-                  isSideNavExpanded={isSideNavExpanded}
-                />
-              )}
             </Header>
           </div>
-          {DDS_MASTHEAD_L1 && navigation && (
+          {mastheadL1Data && DDS_MASTHEAD_L1 && (
             <div ref={mastheadL1Ref}>
               <MastheadL1
+                {...mastheadL1Data}
                 isShort={isMastheadSticky}
-                title={title}
-                eyebrowText={eyebrowText}
-                eyebrowLink={eyebrowLink}
+                navType={navType}
               />
             </div>
           )}
@@ -257,7 +341,7 @@ const Masthead = ({
 
 Masthead.propTypes = {
   /**
-   * Navigation data object/string for Masthead. Use one from below:
+   * Navigation data object/string for Masthead. These navigation properties belongs to the Masthead L0 Top navigation. Use one from below:
    *
    * | Behavior           | Data Type | Description                                 | Example                             |
    * | ------------------ | --------- | ------------------------------------------- | ----------------------------------- |
@@ -321,19 +405,60 @@ Masthead.propTypes = {
   placeHolderText: PropTypes.string,
 
   /**
-   * Title for the masthead L1 (experimental).
+   * All the data that goes to the L1 of the Masthead.
    */
-  title: PropTypes.string,
+  mastheadL1Data: PropTypes.shape({
+    /**
+     * Title for the masthead L1 (experimental).
+     */
+    title: PropTypes.string,
 
-  /**
-   * Text for the eyebrow link in masthead L1 (experimental).
-   */
-  eyebrowText: PropTypes.string,
+    /**
+     * Title optional link for the masthead L1 (experimental).
+     */
+    titleLink: PropTypes.string,
+    /**
+     * Text for the eyebrow link in masthead L1 (experimental).
+     */
+    eyebrowText: PropTypes.string,
 
-  /**
-   * URL for the eyebrow link in masthead L1 (experimental).
-   */
-  eyebrowLink: PropTypes.string,
+    /**
+     * URL for the eyebrow link in masthead L1 (experimental).
+     */
+    eyebrowLink: PropTypes.string,
+    /**
+     * Navigation data object/string for Masthead L1. Use one from below:
+     *
+     * | Behavior           | Data Type | Description                                 | Example                             |
+     * | ------------------ | --------- | ------------------------------------------- | ----------------------------------- |
+     * | default navigation | String    | Default navigation data from IBM.com        | `<MastheadL1 navigationL1="default" />` |
+     * | custom navigation  | Object    | Pass in custom navigation data as an object | `<MastheadL1 navigationL1={myNavObj}/>` |
+     * | none               | null      | No navigation                               | `<MastheadL1 />`                      |
+     *
+     * `Custom` navigation data must follow the same structure and key names as `default`.
+     * See [this](https://www.ibm.com/common/v18/js/data/jsononly/usen.json) for an example.
+     */
+    navigationL1: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(
+        PropTypes.shape({
+          hasMenu: PropTypes.bool,
+          title: PropTypes.string,
+          url: PropTypes.string,
+          menuSections: PropTypes.arrayOf(
+            PropTypes.shape({
+              menuItems: PropTypes.arrayOf(
+                PropTypes.shape({
+                  title: PropTypes.string,
+                  url: PropTypes.string,
+                })
+              ),
+            })
+          ),
+        })
+      ),
+    ]),
+  }),
 };
 
 Masthead.defaultProps = {
@@ -342,9 +467,7 @@ Masthead.defaultProps = {
   searchOpenOnload: false,
   platform: null,
   placeHolderText: 'Search all of IBM',
-  title: null,
-  eyebrowText: null,
-  eyebrowLink: null,
+  mastheadL1Data: null,
 };
 
 export default Masthead;

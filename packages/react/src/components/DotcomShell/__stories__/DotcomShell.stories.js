@@ -5,8 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import content from './data/content';
+import Content from './data/content';
 import DotcomShell from '../DotcomShell';
+import { Micro as footerMicroStory } from '../../Footer/__stories__/Footer.stories.js';
 import { Default as footerStory } from '../../Footer/__stories__/Footer.stories.js';
 import { Default as mastheadStory } from '../../Masthead/__stories__/Masthead.stories.js';
 import React from 'react';
@@ -49,12 +50,120 @@ export default {
 
 export const Default = ({ parameters }) => {
   const { mastheadProps, footerProps } = parameters?.props?.DotcomShell ?? {};
-
   return (
     <DotcomShell mastheadProps={mastheadProps} footerProps={footerProps}>
       <main id="main-content">
-        <div style={{ paddingTop: '6rem' }}>{content}</div>
+        <div style={{ paddingTop: '6rem' }}>
+          <Content />
+        </div>
       </main>
     </DotcomShell>
   );
+};
+
+export const SearchOpenByDefault = ({ parameters }) => (
+  <Default parameters={parameters} />
+);
+
+SearchOpenByDefault.story = {
+  name: 'Search open',
+  parameters: {
+    knobs: {
+      DotcomShell: () => {
+        const {
+          Masthead: mastheadKnobs,
+        } = mastheadStory.story.parameters.knobs;
+        const { Footer: footerKnobs } = footerStory.story.parameters.knobs;
+        return {
+          mastheadProps: {
+            ...mastheadKnobs({ groupId: 'Masthead' }),
+            searchOpenOnload: true,
+          },
+          footerProps: {
+            ...footerKnobs({ groupId: 'Footer' }),
+          },
+        };
+      },
+    },
+  },
+};
+
+export const WithPlatform = ({ parameters }) => (
+  <Default parameters={parameters} />
+);
+
+WithPlatform.story = {
+  name: 'With platform',
+  parameters: {
+    knobs: {
+      DotcomShell: () => {
+        const {
+          Masthead: mastheadKnobs,
+        } = mastheadStory.story.parameters.knobs;
+        const { Footer: footerKnobs } = footerStory.story.parameters.knobs;
+        return {
+          mastheadProps: {
+            ...mastheadKnobs({ groupId: 'Masthead' }),
+            platform: {
+              name: 'IBM Cloud',
+              url: 'https://www.ibm.com/cloud',
+            },
+          },
+          footerProps: {
+            ...footerKnobs({ groupId: 'Footer' }),
+          },
+        };
+      },
+    },
+  },
+};
+
+export const ShortFooter = ({ parameters }) => (
+  <Default parameters={parameters} />
+);
+
+ShortFooter.story = {
+  name: 'With short footer',
+  parameters: {
+    knobs: {
+      DotcomShell: () => {
+        const {
+          Masthead: mastheadKnobs,
+        } = mastheadStory.story.parameters.knobs;
+        const { Footer: footerKnobs } = footerStory.story.parameters.knobs;
+        return {
+          mastheadProps: mastheadKnobs({ groupId: 'Masthead' }),
+          footerProps: {
+            ...footerKnobs({ groupId: 'Footer' }),
+            type: 'short',
+          },
+        };
+      },
+    },
+  },
+};
+
+export const MicroFooter = ({ parameters }) => (
+  <Default parameters={parameters} />
+);
+
+MicroFooter.story = {
+  name: 'With micro footer',
+  parameters: {
+    knobs: {
+      DotcomShell: () => {
+        const {
+          Masthead: mastheadKnobs,
+        } = mastheadStory.story.parameters.knobs;
+        const { Footer: footerKnobs } = footerMicroStory.story.parameters.knobs;
+        return {
+          mastheadProps: mastheadKnobs({ groupId: 'Masthead' }),
+          footerProps: {
+            ...footerKnobs({ groupId: 'Footer' }),
+            type: 'micro',
+          },
+        };
+      },
+    },
+  },
 };

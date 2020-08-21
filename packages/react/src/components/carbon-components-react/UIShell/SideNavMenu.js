@@ -2,19 +2,21 @@
 /* istanbul ignore file */
 
 /**
- * Copyright IBM Corp. 2016, 2018
+ * Copyright IBM Corp. 2016, 2020
  *
  * This source code is licensed under the Apache-2.0 license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
 import ChevronDown20 from '@carbon/icons-react/es/chevron--down/20';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import settings from 'carbon-components/es/globals/js/settings';
 import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 import SideNavIcon from './SideNavIcon';
 
+const { stablePrefix } = ddsSettings;
 const { prefix } = settings;
 
 export class SideNavMenu extends React.Component {
@@ -67,6 +69,11 @@ export class SideNavMenu extends React.Component {
      * For submenu back button to toggle expand/collapse
      */
     isbackbutton: PropTypes.string,
+
+    /**
+     * A callback that is called when this side nav menu is toggled by user gesture.
+     */
+    onToggle: PropTypes.func,
   };
 
   static defaultProps = {
@@ -104,8 +111,32 @@ export class SideNavMenu extends React.Component {
     };
   }
 
-  handleToggleExpand = () => {
-    this.setState(state => ({ isExpanded: !state.isExpanded }));
+  handleToggleExpand = event => {
+    const { onToggle } = this.props;
+    event.persist();
+    this.setState(
+      state => ({ isExpanded: !state.isExpanded }),
+      () => {
+        if (onToggle) {
+          onToggle(event, { isExpanded: this.state.isExpanded });
+        }
+      }
+    );
+  };
+
+  handleKeyToggleExpand = event => {
+    if (event.charCode === 13 || event.charCode === ' ') {
+      const { onToggle } = this.props;
+      event.persist();
+      this.setState(
+        state => ({ isExpanded: !state.isExpanded }),
+        () => {
+          if (onToggle) {
+            onToggle(event, { isExpanded: this.state.isExpanded });
+          }
+        }
+      );
+    }
   };
 
   render() {
@@ -118,6 +149,7 @@ export class SideNavMenu extends React.Component {
       title,
       large,
       isbackbutton,
+      ...rest
     } = this.props;
     const { isExpanded } = this.state;
 
@@ -161,7 +193,11 @@ export class SideNavMenu extends React.Component {
               <IconElement />
             </SideNavIcon>
           )}
-          <span className={`${prefix}--side-nav__submenu-title`}>{title}</span>
+          <span
+            className={`${prefix}--side-nav__submenu-title`}
+            data-autoid={`${rest.autoid}`}>
+            {title}
+          </span>
           <SideNavIcon className={`${prefix}--side-nav__submenu-chevron`} small>
             <ChevronDown20 />
           </SideNavIcon>
@@ -179,6 +215,10 @@ export class SideNavMenu extends React.Component {
         onClick:
           item.props.isbackbutton === 'true'
             ? this.handleToggleExpand.bind(this)
+            : null,
+        onKeyPress:
+          item.props.isbackbutton === 'true'
+            ? this.handleKeyToggleExpand.bind(this)
             : null,
       });
     }

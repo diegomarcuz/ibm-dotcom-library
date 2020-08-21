@@ -5,50 +5,55 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-@import '../../temp-carbon-expressive/link/link-expressive';
-
 /// Footer styles
 /// @access private
 /// @group footer
 
 @mixin footer {
+  :host(#{$dds-prefix}-footer),
   .#{$prefix}--footer {
     @include carbon--theme(
       $carbon--theme--g90,
       feature-flag-enabled('enable-css-custom-properties')
     ) {
-      @include temp-link-expressive;
-
       color: $text-01;
       background-color: $ui-background;
       padding-top: carbon--mini-units(6);
 
-      &--short {
-        padding-top: carbon--mini-units(4);
-      }
-
-      &__main {
-        @include carbon--make-container;
-      }
-
-      &__main-container {
-        @include carbon--make-row;
-
-        flex-direction: column;
-
-        .#{$prefix}--footer--short & {
-          flex-direction: row;
-        }
-
-        @include carbon--breakpoint('lg') {
-          flex-direction: row;
+      .#{$prefix}--modal-content {
+        .#{$prefix}--link {
+          &,
+          &:visited {
+            color: $inverse-01;
+          }
         }
       }
+    }
+  }
 
+  :host(#{$dds-prefix}-footer[size='short']),
+  .#{$prefix}--footer--short {
+    padding-top: carbon--mini-units(4);
+  }
+
+  :host(#{$dds-prefix}-footer[size='micro']),
+  .#{$prefix}--footer--micro {
+    padding-top: 0;
+  }
+
+  :host(#{$dds-prefix}-footer-nav-item),
+  :host(#{$dds-prefix}-legal-nav-item),
+  :host(#{$dds-prefix}-legal-nav-cookie-preferences-placeholder),
+  .#{$prefix}--footer {
+    @include carbon--theme(
+      $carbon--theme--g90,
+      feature-flag-enabled('enable-css-custom-properties')
+    ) {
       .#{$prefix}--footer__link.#{$prefix}--link {
+        @include carbon--type-style('body-long-02');
+
         &,
-        &:visited,
-        &:visited:hover {
+        &:visited {
           color: $text-02;
         }
 
@@ -61,28 +66,50 @@
           color: $text-04;
         }
 
-        &:hover {
+        &:hover,
+        &:visited:hover {
           color: $text-01;
         }
       }
+    }
+  }
 
-      .#{$prefix}--legal-nav__list
-        .#{$prefix}--legal-nav__list-item
-        .#{$prefix}--link {
-        color: $text-02;
-        &:hover {
-          color: $text-01;
-        }
-      }
+  :host(#{$dds-prefix}-legal-nav),
+  .#{$prefix}--footer {
+    @include carbon--theme(
+      $carbon--theme--g90,
+      feature-flag-enabled('enable-css-custom-properties')
+    ) {
+      .#{$prefix}--legal-nav__list {
+        .#{$prefix}--legal-nav__list-item {
+          .#{$prefix}--link {
+            color: $text-02;
 
-      .#{$prefix}--modal-content {
-        .#{$prefix}--link {
-          &,
-          &:visited {
-            color: $inverse-01;
+            &:hover {
+              color: $text-01;
+            }
           }
         }
       }
+    }
+  }
+
+  .#{$prefix}--footer__main {
+    @include carbon--make-container;
+  }
+
+  .#{$prefix}--footer__main-container {
+    @include carbon--make-row;
+
+    flex-direction: column;
+
+    :host(#{$dds-prefix}-footer[size='short']) &,
+    .#{$prefix}--footer--short & {
+      flex-direction: row;
+    }
+
+    @include carbon--breakpoint('lg') {
+      flex-direction: row;
     }
   }
 }

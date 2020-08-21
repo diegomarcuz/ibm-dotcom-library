@@ -4,7 +4,14 @@ import LightboxMediaViewer from './LightboxMediaViewer';
 
 # Lightbox Media Viewer
 
-> The LightboxMediaViewer component is to be utilized within IBM.com.
+> This launches a modal containing an image or video, and a description
+> detailing the media content.
+
+> 💡 Check our
+> [CodeSandbox](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/LightboxMediaViewer)
+> example implementation.
+
+[![Edit @carbon/ibmdotcom-web-components](https://codesandbox.io/static/img/play-codesandbox.svg)](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/LightboxMediaViewer)
 
 ## Getting started
 
@@ -18,7 +25,8 @@ Here's a quick example to get you started.
 @import '@carbon/type/scss/font-face/sans';
 @include carbon--font-face-mono();
 @include carbon--font-face-sans();
-@import '@carbon/ibmdotcom-styles/scss/components/lightbox-media-viewer/_lightbox-media-viewer.scss';
+
+@import '@carbon/ibmdotcom-styles/scss/components/lightbox-media-viewer/lightbox-media-viewer';
 ```
 
 > 💡 Only import fonts once per usage. Don't forget to import the
@@ -100,7 +108,11 @@ Add the following line in your `.env` file at the root of your project.
 
 > 💡 See uri object structure above in `Getting started` section.
 
-> 💡 Also refer to [`<ExpressiveModal>`](http://ibmdotcom-react.mybluemix.net/?path=/docs/components-expressive-modal--default) and Carbon's [`<ComposedModal>`](https://react.carbondesignsystem.com/?path=/story/composedmodal--using-child-nodes) for other props.
+> 💡 Also refer to
+> [`<ExpressiveModal>`](http://ibmdotcom-react.mybluemix.net/?path=/docs/components-expressive-modal--default)
+> and Carbon's
+> [`<ComposedModal>`](https://react.carbondesignsystem.com/?path=/story/composedmodal--using-child-nodes)
+> for other props.
 
 ## Stable selectors
 

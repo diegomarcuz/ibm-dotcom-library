@@ -9,16 +9,16 @@ import React, { useCallback, useEffect, useReducer, useRef } from 'react';
 import Autosuggest from 'react-autosuggest';
 import Close20 from '@carbon/icons-react/es/close/20';
 import cx from 'classnames';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
-import { escapeRegExp } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
+import escapeRegExp from '@carbon/ibmdotcom-utilities/es/utilities/escaperegexp/escaperegexp';
 import HeaderGlobalAction from '../../internal/vendor/carbon-components-react/components/UIShell/HeaderGlobalAction';
-import { LocaleAPI } from '@carbon/ibmdotcom-services';
+import LocaleAPI from '@carbon/ibmdotcom-services/es/services/Locale/Locale';
 import MastheadSearchInput from './MastheadSearchInput';
 import MastheadSearchSuggestion from './MastheadSearchSuggestion';
 import PropTypes from 'prop-types';
 import root from 'window-or-global';
 import Search20 from '@carbon/icons-react/es/search/20';
-import { SearchTypeaheadAPI } from '@carbon/ibmdotcom-services';
+import SearchTypeaheadAPI from '@carbon/ibmdotcom-services/es/services/SearchTypeahead/SearchTypeahead';
 import settings from 'carbon-components/es/globals/js/settings';
 
 const { stablePrefix } = ddsSettings;
@@ -95,7 +95,12 @@ function _reducer(state, action) {
  * http://react-autosuggest.js.org/
  * https://github.com/moroshko/react-autosuggest
  */
-const MastheadSearch = ({ placeHolderText, renderValue, searchOpenOnload }) => {
+const MastheadSearch = ({
+  placeHolderText,
+  renderValue,
+  searchOpenOnload,
+  navType,
+}) => {
   const { ref } = useSearchVisible(false);
 
   /**
@@ -117,10 +122,19 @@ const MastheadSearch = ({ placeHolderText, renderValue, searchOpenOnload }) => {
   const [state, dispatch] = useReducer(_reducer, _initialState);
 
   useEffect(() => {
-    const abortController = new AbortController();
+    const abortController =
+      typeof AbortController !== 'undefined'
+        ? new AbortController()
+        : {
+            signal: {},
+            abort() {
+              this.signal.aborted = true;
+            },
+          };
+    abortController.abort();
     (async () => {
       const response = await LocaleAPI.getLang();
-      if (!abortController.signal && response) {
+      if (!abortController.signal.aborted && response) {
         dispatch({ type: 'setLc', payload: { lc: response.lc } });
         dispatch({ type: 'setCc', payload: { cc: response.cc } });
       }
@@ -233,7 +247,7 @@ const MastheadSearch = ({ placeHolderText, renderValue, searchOpenOnload }) => {
   function closeBtnAction() {
     resetSearch();
     const searchIconRef = root.document.querySelectorAll(
-      `[data-autoid="${stablePrefix}--header__search--search"]`
+      `[data-autoid="${stablePrefix}--masthead-${navType}__l0-search"]`
     );
     searchIconRef && searchIconRef[0].focus();
   }
@@ -385,7 +399,7 @@ const MastheadSearch = ({ placeHolderText, renderValue, searchOpenOnload }) => {
             state.isSearchOpen ? 'Search all of IBM' : 'Open IBM search field'
           }
           className={`${prefix}--header__search--search`}
-          data-autoid={`${stablePrefix}--header__search--search`}
+          data-autoid={`${stablePrefix}--masthead-${navType}__l0-search`}
           tabIndex="0">
           <Search20 />
         </HeaderGlobalAction>
@@ -393,7 +407,7 @@ const MastheadSearch = ({ placeHolderText, renderValue, searchOpenOnload }) => {
           onClick={closeBtnAction}
           aria-label="Close"
           className={`${prefix}--header__search--close`}
-          data-autoid={`${stablePrefix}--header__search--close`}>
+          data-autoid={`${stablePrefix}--masthead-${navType}__l0-search--close`}>
           <Close20 />
         </HeaderGlobalAction>
       </div>
@@ -416,6 +430,11 @@ MastheadSearch.propTypes = {
    * `true` to make the search field open in the initial state.
    */
   searchOpenOnload: PropTypes.bool,
+
+  /**
+   * navigation type for autoids
+   */
+  navType: PropTypes.oneOf(['default, alt, eco']),
 };
 
 MastheadSearch.defaultProps = {

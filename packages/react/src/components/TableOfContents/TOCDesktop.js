@@ -6,11 +6,11 @@
  */
 
 import classNames from 'classnames';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import PropTypes from 'prop-types';
 import React from 'react';
 import settings from 'carbon-components/es/globals/js/settings';
-import { smoothScroll } from '@carbon/ibmdotcom-utilities';
+import smoothScroll from '@carbon/ibmdotcom-utilities/es/utilities/smoothScroll/smoothScroll';
 
 const { stablePrefix } = ddsSettings;
 const { prefix } = settings;
@@ -34,8 +34,7 @@ const TOCDesktop = ({ menuItems, selectedId }) => {
           <li
             key={index}
             data-autoid={`${stablePrefix}--tableofcontents__desktop__item-${item.id}`}
-            className={classNames({
-              [`${prefix}--tableofcontents__desktop__item`]: true,
+            className={classNames(`${prefix}--tableofcontents__desktop__item`, {
               [`${prefix}--tableofcontents__desktop__item--active`]: isActive,
             })}>
             <a

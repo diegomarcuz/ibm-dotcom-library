@@ -2,11 +2,17 @@ import { Props, Description } from '@storybook/addon-docs/blocks';
 import contributing from '../../../../../docs/contributing-license.md';
 import { Card } from './Card';
 
-# Card Link
+# Card
 
-> The card link component uses
+> Cards use
 > [Carbon's Clickable Tile component](https://www.carbondesignsystem.com/components/tile/code#clickable-tile)
 > while presenting content in a concise and readable style.
+
+> 💡 Check our
+> [CodeSandbox](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/Card)
+> example implementation.
+
+[![Edit @carbon/ibmdotcom-web-components](https://codesandbox.io/static/img/play-codesandbox.svg)](https://githubbox.com/carbon-design-system/ibm-dotcom-library/tree/master/packages/react/examples/codesandbox/components/Card)
 
 ## Getting started
 
@@ -20,7 +26,7 @@ Here's a quick example to get you started.
 @import '@carbon/type/scss/font-face/sans';
 @include carbon--font-face-mono();
 @include carbon--font-face-sans();
-@import '@carbon/ibmdotcom-styles/scss/components/card/index.scss';
+@import '@carbon/ibmdotcom-styles/scss/components/card/index';
 ```
 
 > 💡 Only import fonts once per usage. Don't forget to import the Card styles

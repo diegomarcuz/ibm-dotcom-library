@@ -4,10 +4,12 @@
  * This source code is licensed under the Apache-2.0 license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { Fragment, useEffect, useLayoutEffect, useRef } from 'react';
 import Button from '../../internal/vendor/carbon-components-react/components/Button/Button';
-import { settings as ddsSettings } from '@carbon/ibmdotcom-utilities';
+import ddsSettings from '@carbon/ibmdotcom-utilities/es/utilities/settings/settings';
 import PropTypes from 'prop-types';
+import root from 'window-or-global';
+import sameHeight from '@carbon/ibmdotcom-utilities/es/utilities/sameHeight/sameHeight';
 import settings from 'carbon-components/es/globals/js/settings';
 
 const { stablePrefix } = ddsSettings;
@@ -38,12 +40,20 @@ const ButtonGroup = ({ buttons, enableSizeByContent }) => {
               (acc, item) => Math.max(acc, item.offsetWidth),
               0
             );
+            const height = Array.prototype.reduce.call(
+              group.querySelectorAll('.bx--buttongroup-item--pseudo .bx--btn'),
+              (acc, item) => Math.max(acc, item.offsetHeight),
+              0
+            );
+            const hasWordWrap = height > 48;
+            const mobileWidth = root.innerWidth <= 320;
             Array.prototype.forEach.call(
               group.querySelectorAll(
                 '.bx--buttongroup-item:not(.bx--buttongroup-item--pseudo) .bx--btn'
               ),
               item => {
-                item.style.width = `${width + 1}px`;
+                item.style.width = mobileWidth ? `100%` : `${width + 1}px`;
+                item.classList.toggle(`${prefix}--btn--multiline`, hasWordWrap);
               }
             );
           });
@@ -90,6 +100,28 @@ const ButtonGroup = ({ buttons, enableSizeByContent }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (buttons.length > 1) {
+      setSameHeight();
+      root.addEventListener('resize', setSameHeight);
+      return () => root.removeEventListener('resize', setSameHeight);
+    }
+  }, [buttons]);
+
+  /**
+   * Set the buttons to have the same height based on the tallest one
+   */
+  const setSameHeight = () => {
+    root.requestAnimationFrame(() => {
+      const { current: containerNode } = groupRef;
+      if (containerNode) {
+        sameHeight(
+          containerNode.getElementsByClassName(`${prefix}--buttongroup-item`)
+        );
+      }
+    });
+  };
+
   return (
     <ol
       className={`${prefix}--buttongroup`}
@@ -97,14 +129,13 @@ const ButtonGroup = ({ buttons, enableSizeByContent }) => {
       ref={groupRef}>
       {buttons.map((button, key) => {
         return (
-          <>
-            <li key={key} className={`${prefix}--buttongroup-item`}>
+          <Fragment key={key}>
+            <li className={`${prefix}--buttongroup-item`}>
               <Button
-                tabIndex={key === 0 ? 2 : 1}
                 data-autoid={`${stablePrefix}--button-group-${key}`}
                 {...button}
                 type="button"
-                kind={key === 0 ? 'primary' : 'tertiary'}>
+                kind={key === buttons.length - 1 ? 'primary' : 'tertiary'}>
                 {button.copy}
               </Button>
             </li>
@@ -112,18 +143,17 @@ const ButtonGroup = ({ buttons, enableSizeByContent }) => {
               undefined
             ) : (
               <li
-                key={`${key}-pseudo`}
                 className={`${prefix}--buttongroup-item ${prefix}--buttongroup-item--pseudo`}>
                 <Button
                   tabIndex={-1}
                   {...button}
                   type="button"
-                  kind={key === 0 ? 'primary' : 'tertiary'}>
+                  kind={key === buttons.length - 1 ? 'primary' : 'tertiary'}>
                   {button.copy}
                 </Button>
               </li>
             )}
-          </>
+          </Fragment>
         );
       })}
     </ol>

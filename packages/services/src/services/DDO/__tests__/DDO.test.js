@@ -9,11 +9,12 @@ import DDOAPI from '../DDO';
 import digitalDataResponse from './data/response.json';
 import root from 'window-or-global';
 
-jest.mock('@carbon/ibmdotcom-utilities', () => ({
-  settings: {
+jest.mock(
+  '@carbon/ibmdotcom-utilities/lib/utilities/settings/settings',
+  () => ({
     version: 'dds.v1.0.0',
-  },
-}));
+  })
+);
 
 describe('DDOAPI', () => {
   beforeEach(function() {
@@ -35,7 +36,7 @@ describe('DDOAPI', () => {
   it('should set the version in the DDO', async () => {
     await DDOAPI.setVersion();
 
-    expect(root.digitalData.page.version).toEqual('dds.v1.0.0');
+    expect(root.digitalData.page.pageInfo.version).toEqual('dds.v1.0.0');
   });
 
   it('should set a loop if the data layer is not ready', async () => {

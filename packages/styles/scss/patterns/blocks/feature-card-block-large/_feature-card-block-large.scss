@@ -5,11 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-@import '../../../globals/imports';
-@import '../../../components/image/image';
-@import '../../../components/card/index';
-@import '../../../globals/utils/aspect-ratio';
-@import '../../../globals/utils/hang';
+/// @deprecated Remap import to "@carbon/ibmdotcom-styles/scss/components/feature-card-block-large/feature-card-block-large"
+@warn 'Deprecated scss import for `feature-card-block-large`, remap to `@carbon/ibmdotcom-styles/scss/components/feature-card-block-large/feature-card-block-large`';
+@import '../../../components/feature-card-block-large/feature-card-block-large';
 
 $fcb-large-custom-bp-copy: 992px;
 $fcb-large-custom-bp-nocopy: 752px;
@@ -20,20 +18,32 @@ $fcb-breakpoint-up--lg: map-get(
 
 @mixin feature-card-block-large {
   .#{$prefix}--feature-card-block-large {
-    color: $text-01;
-    background: $ui-background;
-    position: relative;
-    height: 100%;
-    @include hang;
+    margin-bottom: $carbon--layout-03;
 
-    @include carbon--breakpoint-between(
-      $fcb-large-custom-bp-copy,
-      $fcb-breakpoint-up--lg
-    ) {
-      padding-top: aspect-ratio(2, 1);
+    @include carbon--breakpoint('md') {
+      margin-bottom: $carbon--layout-05;
     }
-    @include carbon--breakpoint('xlg') {
-      padding-top: aspect-ratio(2, 1);
+
+    @include carbon--breakpoint('lg') {
+      margin-bottom: $carbon--layout-06;
+    }
+
+    &__container {
+      color: $text-01;
+      background: $ui-background;
+      position: relative;
+      height: 100%;
+      @include hang;
+
+      @include carbon--breakpoint-between(
+        $fcb-large-custom-bp-copy,
+        $fcb-breakpoint-up--lg
+      ) {
+        padding-top: aspect-ratio(2, 1);
+      }
+      @include carbon--breakpoint('xlg') {
+        padding-top: aspect-ratio(2, 1);
+      }
     }
 
     &__card.#{$prefix}--card--inverse .#{$prefix}--card__cta,

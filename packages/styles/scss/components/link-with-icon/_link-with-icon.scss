@@ -5,34 +5,72 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+@import 'carbon-components/scss/components/link/link';
+@import '../../globals/vars';
 @import '../../globals/imports';
-@import '../../temp-carbon-expressive/link/link-expressive';
 @import '../lightbox-media-viewer/lightbox-media-viewer';
 
 @mixin link-with-icon {
-  .#{$prefix}--link-with-icon {
-    &__container {
-      display: table;
-    }
-
+  .#{$prefix}--link-with-icon,
+  :host(#{$dds-prefix}-link-with-icon) {
     display: flex;
 
     span {
-      @include carbon--type-style(body-short-02, true);
-
       vertical-align: middle;
       align-self: center;
     }
 
-    svg {
+    svg,
+    ::slotted(svg[slot='icon']) {
       margin-left: $carbon--spacing-03;
       vertical-align: middle;
       align-self: center;
       fill: currentColor;
     }
 
+    &.#{$prefix}--link--disabled {
+      &:not([href]),
+      &:not([button]) {
+        pointer-events: auto;
+        &:hover {
+          display: flex;
+          text-decoration: none;
+        }
+      }
+    }
+
     &:not(:first-of-type) {
       margin-left: $carbon--spacing-07;
+    }
+
+    &.#{$prefix}--link-with-icon__icon-left {
+      justify-content: flex-end;
+      flex-direction: row-reverse;
+
+      svg {
+        align-self: start;
+        position: relative;
+        top: 1px;
+        margin-left: 0;
+        margin-right: $carbon--spacing-03;
+      }
+    }
+  }
+
+  .#{$prefix}--link-with-icon__container {
+    display: table;
+
+    &__inverse {
+      .#{$prefix}--link {
+        color: $inverse-link;
+      }
+
+      @include carbon--theme(
+        $carbon--theme--g100,
+        feature-flag-enabled('enable-css-custom-properties')
+      ) {
+        @include link;
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "@carbon/ibmdotcom-vanilla",
   "description": "IBM.com Library Vanilla Components",
-  "version": "0.8.0-rc.4",
+  "version": "0.10.0-rc.0",
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -34,15 +34,16 @@
     "jsdoc": "rimraf docs && jsdoc -c ./jsdoc.json ./README.md",
     "build-storybook": "cross-env BABEL_ENV=es build-storybook",
     "start": "yarn storybook",
-    "storybook": "start-storybook -p 9000"
+    "storybook": "start-storybook -p 9000",
+    "upgrade-carbon": "yarn upgrade-interactive @carbon/icon-helpers @carbon/icons @carbon/grid --latest"
   },
   "dependencies": {
     "@babel/runtime": "^7.5.5",
-    "@carbon/ibmdotcom-services": "1.8.0-rc.2",
-    "@carbon/ibmdotcom-styles": "1.8.0-rc.3",
-    "@carbon/ibmdotcom-utilities": "1.8.0-rc.2",
-    "@carbon/icon-helpers": "10.7.0",
-    "@carbon/icons": "10.10.2",
+    "@carbon/ibmdotcom-services": "1.10.0-rc.0",
+    "@carbon/ibmdotcom-styles": "1.10.0-rc.0",
+    "@carbon/ibmdotcom-utilities": "1.10.0-rc.0",
+    "@carbon/icon-helpers": "10.9.0",
+    "@carbon/icons": "10.15.0",
     "@tarekraafat/autocomplete.js": "^7.2.0",
     "classnames": "2.2.6",
     "window-or-global": "^1.0.1"
@@ -59,7 +60,7 @@
     "@babel/plugin-transform-object-assign": "^7.2.0",
     "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
-    "@carbon/grid": "^10.8.0",
+    "@carbon/grid": "^10.12.0",
     "@percy/agent": "^0.26.0",
     "@percy/puppeteer": "^1.0.0",
     "@storybook/addon-a11y": "^5.3.0",
